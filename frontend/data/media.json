@@ -1,0 +1,48 @@
+{
+  "media": [
+    {
+      "id": 1,
+      "treeId": 1,
+      "memberId": 1,
+      "title": "Ảnh chân dung cụ Trần Văn A",
+      "description": "Ảnh chụp năm 2005 tại từ đường dòng họ",
+      "fileUrl": "/media/member1_photo1.jpg",
+      "fileType": "image",
+      "uploadDate": "2024-01-15",
+      "uploadedBy": 2
+    },
+    {
+      "id": 2,
+      "treeId": 1,
+      "memberId": 2,
+      "title": "Ảnh cưới cụ ông cụ bà",
+      "description": "Ảnh cưới chụp năm 1960",
+      "fileUrl": "/media/wedding_1960.jpg",
+      "fileType": "image",
+      "uploadDate": "2024-01-20",
+      "uploadedBy": 2
+    },
+    {
+      "id": 3,
+      "treeId": 1,
+      "memberId": null,
+      "title": "Từ đường dòng họ",
+      "description": "Hình ảnh từ đường dòng họ Trần Lê",
+      "fileUrl": "/media/family_shrine.jpg",
+      "fileType": "image",
+      "uploadDate": "2024-01-25",
+      "uploadedBy": 2
+    },
+    {
+      "id": 4,
+      "treeId": 1,
+      "memberId": null,
+      "title": "Gia phả gốc",
+      "description": "Bản gia phả viết tay từ thế kỷ 19",
+      "fileUrl": "/media/original_genealogy.pdf",
+      "fileType": "document",
+      "uploadDate": "2024-01-30",
+      "uploadedBy": 2
+    }
+  ]
+}

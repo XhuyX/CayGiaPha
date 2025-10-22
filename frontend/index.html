@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Gia Phả Online</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet"  href="css/style.css">
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Trang Đăng nhập -->
+    <div id="loginPage">
+        <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-md w-full space-y-8">
+                <div>
+                    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Đăng nhập vào tài khoản</h2>
+                    <p class="mt-2 text-center text-sm text-gray-600">Quản lý gia phả trực tuyến</p>
+                </div>
+                <div class="mt-8 space-y-6 bg-white p-8 shadow-2xl rounded-xl">
+                    <input id="usernameInput" type="text" placeholder="Tên đăng nhập (nhập 'admin' để vào)" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <input type="password" placeholder="Mật khẩu" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <button onclick="handleLogin()" class="w-full py-3 px-4 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-700 transition">Đăng nhập</button>
+                    <p class="text-center text-sm">Chưa có tài khoản? <a href="#" onclick="showPage('registerPage')" class="font-medium text-blue-600 hover:text-blue-500">Đăng ký</a></p>
+                    
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3">Quản lý dữ liệu JSON:</h3>
+                        <div class="space-y-2">
+                            <button onclick="downloadJSON()" class="w-full py-2 px-4 bg-green-600 text-white text-sm rounded-md hover:bg-green-700 transition">💾 Tải xuống dữ liệu (JSON)</button>
+                            <label class="w-full py-2 px-4 bg-purple-600 text-white text-sm rounded-md hover:bg-purple-700 transition cursor-pointer block text-center">
+                                📂 Tải lên dữ liệu (JSON)
+                                <input type="file" id="uploadJSON" accept=".json" class="hidden" onchange="uploadJSON(event)">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trang Đăng ký -->
+    <div id="registerPage" class="hidden">
+        <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-md w-full space-y-8">
+                <div>
+                    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Tạo tài khoản mới</h2>
+                </div>
+                <div class="mt-8 space-y-6 bg-white p-8 shadow-2xl rounded-xl">
+                    <input type="text" placeholder="Tên đăng nhập" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <input type="email" placeholder="Email" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <input type="password" placeholder="Mật khẩu" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <input type="password" placeholder="Nhập lại mật khẩu" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <button onclick="showPage('treeSelectionPage')" class="w-full py-3 px-4 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-700 transition">Đăng ký</button>
+                    <p class="text-center text-sm">Đã có tài khoản? <a href="#" onclick="showPage('loginPage')" class="font-medium text-blue-600 hover:text-blue-500">Đăng nhập</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trang Chọn Cây Gia Phả -->
+    <div id="treeSelectionPage" class="hidden">
+        <nav class="bg-white shadow-md sticky top-0 z-40">
+            <div class="max-w-screen-xl mx-auto px-4">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <span class="font-bold text-xl text-gray-800">🌳 Gia Phả Online</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="downloadJSON()" class="px-3 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700">💾 Tải xuống JSON</button>
+                        <span class="text-gray-600">Xin chào, <span id="currentUsername">Người Dùng</span>!</span>
+                        <button onclick="showPage('loginPage')" class="px-3 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700">Đăng xuất</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="max-w-screen-xl mx-auto py-6 px-4">
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-2xl font-bold text-gray-900">Danh sách Cây Gia Phả</h1>
+                    <button onclick="openCreateTreeModal()" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold">➕ Tạo Cây Gia Phả Mới</button>
+                </div>
+
+                <div id="treeListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Tree cards will be generated here -->
+                </div>
+
+                <div id="noTreesMessage" class="hidden text-center py-12">
+                    <svg class="mx-auto h-24 w-24 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <h3 class="mt-2 text-xl font-medium text-gray-900">Chưa có cây gia phả nào</h3>
+                    <p class="mt-1 text-gray-500">Hãy tạo cây gia phả đầu tiên của bạn</p>
+                    <button onclick="openCreateTreeModal()" class="mt-4 px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-semibold">Tạo Ngay</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Trang Xem Cây Gia Phả -->
+    <div id="appPage" class="hidden">
+        <nav class="bg-white shadow-md sticky top-0 z-40">
+            <div class="max-w-screen-xl mx-auto px-4">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center space-x-4">
+                        <button onclick="showPage('treeSelectionPage')" class="text-blue-600 hover:text-blue-800 font-medium">← Quay lại danh sách</button>
+                        <span class="font-bold text-xl text-gray-800" id="currentTreeName">Gia Phả</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <button onclick="downloadJSON()" class="px-3 py-2 rounded-md text-sm font-medium text-white bg-green-600 hover:bg-green-700">💾 Tải xuống JSON</button>
+                        <span class="text-gray-600">Xin chào, <span id="currentUsername2">Người Dùng</span>!</span>
+                        <button onclick="showPage('loginPage')" class="px-3 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700">Đăng xuất</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <main class="max-w-screen-xl mx-auto py-6 px-4">
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900" id="treeTitle">Gia phả dòng họ</h1>
+                        <p class="text-sm text-gray-600 mt-1" id="treeDescription"></p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openAddMemberModal()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-semibold">➕ Thêm Thành Viên</button>
+                    </div>
+                </div>
+                <div id="tree" class="border-2 border-dashed border-gray-300 rounded-lg p-2"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Tạo Cây Gia Phả Mới -->
+    <div id="createTreeModal" class="custom-modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">Tạo Cây Gia Phả Mới</h2>
+                <button onclick="closeCreateTreeModal()" class="text-gray-500 hover:text-gray-700 text-3xl">&times;</button>
+            </div>
+            
+            <form id="createTreeForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tên Gia Phả *</label>
+                    <input type="text" id="newTreeName" required placeholder="VD: Gia phả dòng họ Nguyễn" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nơi Bắt Nguồn</label>
+                    <input type="text" id="newTreeOrigin" placeholder="VD: Làng Mẹo, Thái Bình" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Tên Chi</label>
+                    <input type="text" id="newTreeBranch" placeholder="VD: Chi thứ hai" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Ghi chú hoặc mô tả</label>
+                    <textarea id="newTreeDescription" rows="4" placeholder="Mô tả chi tiết về dòng họ..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+                </div>
+                
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" onclick="closeCreateTreeModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">Hủy</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Tạo Cây Gia Phả</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Thêm Thành Viên -->
+    <div id="addMemberModal" class="custom-modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">Thêm Thành Viên Mới</h2>
+                <button onclick="closeAddMemberModal()" class="text-gray-500 hover:text-gray-700 text-3xl">&times;</button>
+            </div>
+            
+            <form id="addMemberForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Họ và Tên *</label>
+                    <input type="text" id="memberName" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Giới tính *</label>
+                    <select id="memberGender" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="male">Nam</option>
+                        <option value="female">Nữ</option>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Năm sinh</label>
+                        <input type="text" id="memberDob" placeholder="VD: 1990" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Năm mất</label>
+                        <input type="text" id="memberDod" placeholder="VD: 2020" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Quan hệ</label>
+                    <select id="memberRelation" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="independent">Thành viên độc lập (gốc)</option>
+                        <option value="child">Con của</option>
+                        <option value="spouse">Vợ/Chồng của</option>
+                    </select>
+                </div>
+                
+                <div id="parentSelectDiv" class="hidden">
+                    <label id="parentSelectLabel" class="block text-sm font-medium text-gray-700 mb-1">Chọn người liên kết</label>
+                    <select id="memberParent" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">-- Chọn --</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">URL Ảnh đại diện</label>
+                    <input type="text" id="memberImg" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <p class="text-xs text-gray-500 mt-1">Để trống sẽ dùng ảnh mặc định</p>
+                </div>
+                
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" onclick="closeAddMemberModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">Hủy</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Thêm Thành Viên</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Trang Admin -->
+    <div id="adminPage" class="hidden">
+        <nav class="bg-white shadow-md sticky top-0 z-40">
+             <div class="max-w-screen-xl mx-auto px-4">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center"><span class="font-bold text-xl text-gray-800">🔧 Trang Quản Trị</span></div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-600">Xin chào, Admin!</span>
+                        <button onclick="showPage('loginPage')" class="px-3 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700">Đăng xuất</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <main class="max-w-screen-xl mx-auto py-6 px-4">
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h1 class="text-2xl font-bold text-gray-900 mb-6">Quản lý Người dùng</h1>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead class="bg-gray-200">
+                            <tr>
+                                <th class="py-3 px-4 text-left">Tên đăng nhập</th>
+                                <th class="py-3 px-4 text-left">Email</th>
+                                <th class="py-3 px-4 text-left">Ngày tạo</th>
+                                <th class="py-3 px-4 text-center">Trạng thái</th>
+                                <th class="py-3 px-4 text-center">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://balkan.app/js/familytree.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+</html>

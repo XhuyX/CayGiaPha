@@ -1,0 +1,22 @@
+{
+  "marriages": [
+    {
+      "id": 1,
+      "husbandId": 1,
+      "wifeId": 2,
+      "marriageDate": "1960-03-15",
+      "divorceDate": null,
+      "status": "married",
+      "description": "Kết hôn theo truyền thống tại quê nhà"
+    },
+    {
+      "id": 2,
+      "husbandId": 5,
+      "wifeId": 4,
+      "marriageDate": "1990-11-20",
+      "divorceDate": null,
+      "status": "married",
+      "description": "Kết hôn tại Hà Nội"
+    }
+  ]
+}

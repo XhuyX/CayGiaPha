@@ -1,0 +1,60 @@
+.modal {
+    transition: opacity 0.25s ease;
+}
+
+body.modal-active {
+    overflow: hidden;
+}
+
+#tree {
+    width: 100%;
+    height: 700px;
+}
+
+.custom-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.custom-modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.bft-img-button>svg {
+    justify-self: center;
+}
+
+.tree-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.tree-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.tree-card.selected {
+    border: 3px solid #2563eb;
+    background-color: #eff6ff;
+}
