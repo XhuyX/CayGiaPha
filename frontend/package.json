@@ -1,0 +1,25 @@
+{
+  "name": "family-tree-frontend",
+  "version": "1.0.0",
+  "description": "Frontend cho hệ thống quản lý gia phả",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": ["family-tree", "genealogy"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ejs": "^3.1.9",
+    "express-session": "^1.17.3",
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
+

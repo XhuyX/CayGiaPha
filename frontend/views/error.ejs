@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title + ' - ' : '' %>Hệ Thống Quản Lý Gia Phả Online</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/toast.js"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div class="text-center">
+        <div class="mx-auto h-24 w-24 bg-red-100 rounded-full flex items-center justify-center mb-6">
+            <i class="fas fa-exclamation-triangle text-red-500 text-4xl"></i>
+        </div>
+        <h1 class="text-4xl font-bold text-gray-900 mb-4"><%= typeof title !== 'undefined' ? title : 'Lỗi' %></h1>
+        <p class="text-xl text-gray-600 mb-8"><%= typeof message !== 'undefined' ? message : 'Có lỗi xảy ra' %></p>
+        <a href="/trees" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-semibold shadow-lg hover:shadow-xl">
+            <i class="fas fa-home mr-2"></i>Về trang chủ
+        </a>
+    </div>
+</div>
+<script src="/js/familytree-simple.js"></script>
+<script src="/js/main.js"></script>
+</body>
+</html>
+

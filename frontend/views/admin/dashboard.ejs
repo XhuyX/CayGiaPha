@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title + ' - ' : '' %>Hệ Thống Quản Lý Gia Phả Online</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/toast.js"></script>
+    <script src="/js/confirm-modal.js"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        .hover-lift {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .tab-button {
+            transition: all 0.3s;
+        }
+        .tab-button.active {
+            background: linear-gradient(to right, #6366f1, #8b5cf6);
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+    </style>
+</head>
+<body class="font-sans">
+<div class="min-h-screen w-full bg-[#fefcff] relative">
+    <!-- Dreamy Sky Pink Glow Background -->
+    <div class="absolute inset-0 z-0" style="
+        background-image: 
+            radial-gradient(circle at 30% 70%, rgba(173, 216, 230, 0.35), transparent 60%),
+            radial-gradient(circle at 70% 30%, rgba(255, 182, 193, 0.4), transparent 60%);
+    "></div>
+    
+    <div class="relative z-10">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-40 border-b border-gray-200">
+        <div class="max-w-screen-xl mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="h-10 w-10 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-cog text-white"></i>
+                    </div>
+                    <span class="font-bold text-xl text-gray-800">Trang Quản Trị</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-gray-600">Xin chào, <strong><%= user.username %></strong>!</span>
+                    <form action="/logout" method="POST" class="inline">
+                        <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-all shadow-md hover:shadow-lg">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Đăng xuất
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-screen-xl mx-auto py-8 px-4 fade-in">
+        <!-- Tabs -->
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 mb-6">
+            <div class="flex border-b border-gray-200">
+                <button onclick="switchTab('users')" id="tab-users" class="tab-button active flex-1 px-6 py-4 text-center font-semibold text-gray-700 hover:bg-gray-50 rounded-tl-2xl">
+                    <i class="fas fa-users-cog mr-2"></i>Quản lý Người dùng
+                </button>
+                <button onclick="switchTab('trees')" id="tab-trees" class="tab-button flex-1 px-6 py-4 text-center font-semibold text-gray-700 hover:bg-gray-50 rounded-tr-2xl">
+                    <i class="fas fa-sitemap mr-2"></i>Quản lý Cây Gia Phả
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab Content: Users -->
+        <div id="tab-content-users" class="tab-content active">
+            <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                <h1 class="text-3xl font-bold text-gray-900 mb-6">
+                    <i class="fas fa-users-cog text-purple-600 mr-2"></i>Quản lý Người dùng
+                </h1>
+                
+                <% if (typeof error !== 'undefined' && error) { %>
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded mb-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-circle text-red-500"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-red-700"><%= error %></p>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white rounded-lg overflow-hidden">
+                        <thead class="bg-gradient-to-r from-gray-100 to-gray-200">
+                            <tr>
+                                <th class="py-4 px-6 text-left text-sm font-semibold text-gray-700">
+                                    <i class="fas fa-user mr-2"></i>Tên đăng nhập
+                                </th>
+                                <th class="py-4 px-6 text-left text-sm font-semibold text-gray-700">
+                                    <i class="fas fa-envelope mr-2"></i>Email
+                                </th>
+                                <th class="py-4 px-6 text-left text-sm font-semibold text-gray-700">
+                                    <i class="fas fa-calendar mr-2"></i>Ngày tạo
+                                </th>
+                                <th class="py-4 px-6 text-center text-sm font-semibold text-gray-700">
+                                    <i class="fas fa-info-circle mr-2"></i>Trạng thái
+                                </th>
+                                <th class="py-4 px-6 text-center text-sm font-semibold text-gray-700">
+                                    <i class="fas fa-cog mr-2"></i>Hành động
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-table-body" class="divide-y divide-gray-200">
+                            <% if (users && users.length > 0) { %>
+                                <% users.forEach(user => { %>
+                                    <tr class="hover:bg-gray-50 transition">
+                                        <td class="py-4 px-6 text-sm text-gray-900"><%= user.username %></td>
+                                        <td class="py-4 px-6 text-sm text-gray-600"><%= user.email %></td>
+                                        <td class="py-4 px-6 text-sm text-gray-600"><%= user.created %></td>
+                                        <td class="py-4 px-6 text-center">
+                                            <% if (user.active) { %>
+                                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                                    <i class="fas fa-check-circle mr-1"></i>Hoạt động
+                                                </span>
+                                            <% } else { %>
+                                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                                    <i class="fas fa-times-circle mr-1"></i>Bị khóa
+                                                </span>
+                                            <% } %>
+                                        </td>
+                                        <td class="py-4 px-6 text-center">
+                                            <% 
+                                                const userId = user.id;
+                                                const userActive = user.active;
+                                                const btnClass = userActive ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : 'bg-green-500 hover:bg-green-600 text-white';
+                                                const iconName = userActive ? 'lock' : 'unlock';
+                                                const btnText = userActive ? 'Khóa' : 'Mở khóa';
+                                            %>
+                                            <button onclick="adminToggleUserStatus(<%= userId %>, <%= userActive %>)" 
+                                                class="px-4 py-2 text-sm font-semibold rounded-lg transition-all shadow-md hover:shadow-lg <%= btnClass %>"
+                                                data-user-id="<%= userId %>"
+                                                data-is-active="<%= userActive %>">
+                                                <i class="fas fa-<%= iconName %> mr-1"></i>
+                                                <%= btnText %>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr>
+                                    <td colspan="5" class="py-12 text-center text-gray-500">
+                                        <i class="fas fa-users text-4xl mb-4 opacity-50"></i>
+                                        <p>Chưa có người dùng nào</p>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Trees -->
+        <div id="tab-content-trees" class="tab-content">
+            <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-3xl font-bold text-gray-900">
+                            <i class="fas fa-sitemap text-blue-600 mr-2"></i>Quản lý Cây Gia Phả
+                        </h1>
+                        <p class="text-gray-600 mt-1">Quản lý và xem các cây gia phả của bạn</p>
+                    </div>
+                    <button onclick="openCreateTreeModal()" 
+                        class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 font-semibold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                        <i class="fas fa-plus mr-2"></i>Tạo Cây Gia Phả Mới
+                    </button>
+                </div>
+
+                <div id="treeListContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <% if (typeof trees !== 'undefined' && trees && trees.length > 0) { %>
+                        <% trees.forEach(tree => { %>
+                            <div onclick="selectTree(<%= tree.id %>)" 
+                                class="tree-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md p-6 border-2 border-gray-200 hover:border-blue-400 transition-all cursor-pointer hover-lift">
+                                <div class="flex justify-between items-start mb-4">
+                                    <div class="flex-1">
+                                        <h3 class="text-xl font-bold text-gray-800 mb-2">
+                                            <i class="fas fa-tree text-blue-600 mr-2"></i><%= tree.name %>
+                                        </h3>
+                                        <div class="space-y-2 text-sm text-gray-600">
+                                            <% if (tree.origin) { %>
+                                                <p class="flex items-center">
+                                                    <i class="fas fa-map-marker-alt text-blue-500 mr-2 w-4"></i>
+                                                    <span><%= tree.origin %></span>
+                                                </p>
+                                            <% } %>
+                                            <% if (tree.branch) { %>
+                                                <p class="flex items-center">
+                                                    <i class="fas fa-code-branch text-indigo-500 mr-2 w-4"></i>
+                                                    <span><%= tree.branch %></span>
+                                                </p>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                    <button onclick="event.stopPropagation(); deleteTree(<%= tree.id %>)" 
+                                        class="text-red-500 hover:text-red-700 transition p-2 hover:bg-red-50 rounded-lg">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-4 pt-4 border-t border-gray-200">
+                                    <p class="text-sm text-gray-500 flex items-center">
+                                        <i class="fas fa-users text-gray-400 mr-2"></i>
+                                        <strong class="text-gray-700"><%= tree.members ? tree.members.length : 0 %></strong> thành viên
+                                    </p>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div id="noTreesMessage" class="col-span-full text-center py-12">
+                            <div class="mx-auto h-24 w-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                                <i class="fas fa-tree text-gray-400 text-4xl"></i>
+                            </div>
+                            <h3 class="text-xl font-medium text-gray-900 mb-2">Chưa có cây gia phả nào</h3>
+                            <p class="text-gray-500 mb-6">Hãy tạo cây gia phả đầu tiên của bạn</p>
+                            <button onclick="openCreateTreeModal()" 
+                                class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg hover:from-green-600 hover:to-emerald-700 font-semibold transition-all shadow-lg hover:shadow-xl">
+                                <i class="fas fa-plus mr-2"></i>Tạo Cây Gia Phả Mới
+                            </button>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Modal Tạo Cây Gia Phả -->
+<div id="createTreeModal" class="custom-modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-gray-900">
+                <i class="fas fa-tree text-green-600 mr-2"></i>Tạo Cây Gia Phả Mới
+            </h2>
+            <button onclick="closeCreateTreeModal()" class="text-gray-500 hover:text-gray-700 text-3xl transition">&times;</button>
+        </div>
+        
+        <form id="createTreeForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    <i class="fas fa-tag text-blue-500 mr-2"></i>Tên Gia Phả *
+                </label>
+                <input type="text" id="newTreeName" required placeholder="VD: Gia phả dòng họ Nguyễn" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>Nơi Bắt Nguồn
+                </label>
+                <input type="text" id="newTreeOrigin" placeholder="VD: Làng Mẹo, Thái Bình" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    <i class="fas fa-code-branch text-blue-500 mr-2"></i>Tên Chi
+                </label>
+                <input type="text" id="newTreeBranch" placeholder="VD: Chi thứ hai" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    <i class="fas fa-file-alt text-blue-500 mr-2"></i>Ghi chú hoặc mô tả
+                </label>
+                <textarea id="newTreeDescription" rows="4" placeholder="Mô tả chi tiết về dòng họ..." 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"></textarea>
+            </div>
+            
+            <div class="flex justify-end gap-3 pt-4">
+                <button type="button" onclick="closeCreateTreeModal()" 
+                    class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-semibold">
+                    Hủy
+                </button>
+                <button type="submit" 
+                    class="px-6 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all font-semibold shadow-lg hover:shadow-xl">
+                    <i class="fas fa-check mr-2"></i>Tạo Cây Gia Phả
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Khởi tạo biến global
+if (typeof API_BASE === 'undefined') {
+    var API_BASE = '/api';
+}
+if (typeof currentTreeId === 'undefined') {
+    var currentTreeId = null;
+}
+if (typeof familyTrees === 'undefined') {
+    var familyTrees = [];
+}
+
+// Khởi tạo currentUser từ server
+<% if (typeof user !== 'undefined' && user) { %>
+if (typeof currentUser === 'undefined' || !currentUser) {
+    var currentUser = <%- JSON.stringify(user) %>;
+}
+<% } %>
+
+// Gán giá trị từ server
+<% if (typeof trees !== 'undefined' && trees) { %>
+familyTrees = <%- JSON.stringify(trees) %>;
+<% } else { %>
+familyTrees = [];
+<% } %>
+
+// Tab switching
+function switchTab(tab) {
+    // Update buttons
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`tab-${tab}`).classList.add('active');
+    
+    // Update content
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    document.getElementById(`tab-content-${tab}`).classList.add('active');
+}
+
+// Tree management functions
+function selectTree(treeId) {
+    window.location.href = `/tree/${treeId}`;
+}
+
+function openCreateTreeModal() {
+    document.getElementById('createTreeModal').classList.add('active');
+    document.body.classList.add('modal-active');
+    document.getElementById('createTreeForm').reset();
+}
+
+function closeCreateTreeModal() {
+    document.getElementById('createTreeModal').classList.remove('active');
+    document.body.classList.remove('modal-active');
+}
+
+async function deleteTree(treeId) {
+    const confirmed = await showConfirm('Bạn có chắc chắn muốn xóa cây gia phả này không? Hành động này không thể hoàn tác!');
+    if (!confirmed) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/api/family-trees/${treeId}`, {
+            method: 'DELETE'
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (typeof familyTrees !== 'undefined') {
+                familyTrees = familyTrees.filter(t => t.id !== treeId);
+            }
+            
+            if (typeof renderTreeList === 'function') {
+                await renderTreeList();
+            } else {
+                await renderTreeListLocal();
+            }
+            
+            if (typeof showToast !== 'undefined') {
+                showToast('Đã xóa cây gia phả thành công!', 'success');
+            }
+        } else {
+            if (typeof showToast !== 'undefined') {
+                showToast('Xóa thất bại: ' + (data.message || 'Có lỗi xảy ra'), 'error');
+            }
+        }
+    } catch (error) {
+        console.error('Failed to delete tree:', error);
+        if (typeof showToast !== 'undefined') {
+            showToast('Lỗi xóa cây gia phả: ' + error.message, 'error');
+        }
+    }
+}
+
+async function renderTreeListLocal() {
+    const container = document.getElementById('treeListContainer');
+    const noTreesMsg = document.getElementById('noTreesMessage');
+    
+    if (!container) return;
+    
+    try {
+        const userId = currentUser ? currentUser.id : null;
+        if (!userId) {
+            console.error('Cannot reload trees: no userId');
+            return;
+        }
+        
+        const response = await fetch(`/api/family-trees/${userId}`);
+        const result = await response.json();
+        
+        if (result.success && result.trees) {
+            familyTrees = result.trees;
+        }
+    } catch (error) {
+        console.error('Failed to reload trees:', error);
+    }
+    
+    if (!familyTrees || familyTrees.length === 0) {
+        container.innerHTML = '';
+        if (noTreesMsg) {
+            noTreesMsg.classList.remove('hidden');
+        }
+        return;
+    }
+    
+    if (noTreesMsg) {
+        noTreesMsg.classList.add('hidden');
+    }
+    
+    container.innerHTML = familyTrees.map(tree => `
+        <div onclick="selectTree(${tree.id})" 
+            class="tree-card bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md p-6 border-2 border-gray-200 hover:border-blue-400 transition-all cursor-pointer hover-lift">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">
+                        <i class="fas fa-tree text-blue-600 mr-2"></i>${tree.name || 'Chưa có tên'}
+                    </h3>
+                    <div class="space-y-2 text-sm text-gray-600">
+                        ${tree.origin ? `
+                            <p class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-blue-500 mr-2 w-4"></i>
+                                <span>${tree.origin}</span>
+                            </p>
+                        ` : ''}
+                        ${tree.branch ? `
+                            <p class="flex items-center">
+                                <i class="fas fa-code-branch text-indigo-500 mr-2 w-4"></i>
+                                <span>${tree.branch}</span>
+                            </p>
+                        ` : ''}
+                    </div>
+                </div>
+                <button onclick="event.stopPropagation(); deleteTree(${tree.id})" 
+                    class="text-red-500 hover:text-red-700 transition p-2 hover:bg-red-50 rounded-lg">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <p class="text-sm text-gray-500 flex items-center">
+                    <i class="fas fa-users text-gray-400 mr-2"></i>
+                    Số thành viên: <strong class="ml-1">${tree.members ? tree.members.length : 0}</strong>
+                </p>
+            </div>
+        </div>
+    `).join('');
+}
+
+// User management - định nghĩa trong IIFE để tránh conflict với main.js
+(function() {
+    window.adminToggleUserStatus = async function(userId, currentActiveStatus) {
+        console.log('🔒 Toggle user status called:', { userId, currentActiveStatus });
+        
+        try {
+            // Xác định trạng thái mới (toggle từ trạng thái hiện tại)
+            const newActiveStatus = !currentActiveStatus;
+            
+            console.log('🔄 Switching to status:', newActiveStatus);
+            
+            const response = await fetch(`/api/admin/users/${userId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ active: newActiveStatus })
+            });
+            
+            console.log('📡 Response status:', response.status);
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ HTTP error:', response.status, errorText);
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            console.log('✅ Response data:', data);
+            
+            if (data.success) {
+                if (typeof showToast !== 'undefined') {
+                    showToast('Cập nhật trạng thái thành công!', 'success');
+                } else {
+                    alert('Cập nhật trạng thái thành công!');
+                }
+                // Reload sau 1 giây để user thấy toast
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                console.error('❌ API returned success: false', data);
+                if (typeof showToast !== 'undefined') {
+                    showToast('Cập nhật thất bại: ' + (data.message || 'Có lỗi xảy ra'), 'error');
+                } else {
+                    alert('Cập nhật thất bại: ' + (data.message || 'Có lỗi xảy ra'));
+                }
+            }
+        } catch (error) {
+            console.error('❌ Failed to toggle user status:', error);
+            const errorMsg = error.message || 'Có lỗi xảy ra';
+            if (typeof showToast !== 'undefined') {
+                showToast('Lỗi cập nhật: ' + errorMsg, 'error');
+            } else {
+                alert('Lỗi cập nhật: ' + errorMsg);
+            }
+        }
+    };
+    
+    // Alias để tương thích với onclick
+    window.toggleUserStatus = window.adminToggleUserStatus;
+})();
+</script>
+<script src="/js/familytree-simple.js"></script>
+<script src="/js/main.js"></script>
+    </div>
+</div>
+</body>
+</html>

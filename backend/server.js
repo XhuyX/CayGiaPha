@@ -26,8 +26,13 @@ async function startServer() {
         await database.connect();
         
         app.listen(PORT, () => {
-            console.log(`🚀 Server đang chạy tại http://localhost:${PORT}`);
+            console.log('═══════════════════════════════════════════════════════════');
+            console.log('🚀 BACKEND SERVER ĐÃ KHỞI ĐỘNG');
+            console.log('═══════════════════════════════════════════════════════════');
+            console.log(`📍 Server đang chạy tại: http://localhost:${PORT}`);
             console.log(`📊 Kết nối database thành công!`);
+            console.log(`🔗 API endpoints: http://localhost:${PORT}/api`);
+            console.log('═══════════════════════════════════════════════════════════');
         });
     } catch (err) {
         console.error('❌ Không thể khởi động server:', err);
@@ -37,7 +42,6 @@ async function startServer() {
 
 // Xử lý tắt server
 process.on('SIGINT', async () => {
-    console.log('\n🛑 Đang tắt server...');
     await database.disconnect();
     process.exit(0);
 });
