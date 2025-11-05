@@ -170,15 +170,3 @@ Mở trình duyệt: `http://localhost:3001`
 
 Xem chi tiết: [`database/CreateDatabase.sql`](database/CreateDatabase.sql)
 
-## 📄 License
-
-MIT License
-
-## 📧 Liên hệ
-
-- **Repository:** https://github.com/XhuyX/CayGiaPha
-- Tạo issue trên GitHub nếu có câu hỏi
-
----
-
-**Phát triển với ❤️ cho cộng đồng Việt Nam**
