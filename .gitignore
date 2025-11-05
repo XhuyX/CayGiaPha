@@ -40,8 +40,8 @@ desktop.ini
 *.sqlite
 *.sqlite3
 
-# Documentation (optional - uncomment if you don't want to commit docs)
-# *.docx
+# Documentation files
+*.docx
 
 # Empty directories (will be ignored by git anyway)
 # But we can add .gitkeep to preserve structure if needed
