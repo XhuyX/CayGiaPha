@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prototype Hoàn Chỉnh - Web Gia Phả với FamilyTreeJS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .modal { transition: opacity 0.25s ease; }
+        body.modal-active { overflow: hidden; }
+        
+        #tree {
+            width: 100%;
+            height: 700px;
+        }
+        
+        .custom-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .custom-modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        /* Thêm đoạn này vào trong thẻ <style> của bạn */
+/* THAY THẾ ĐOẠN CSS CŨ BẰNG ĐOẠN NÀY */
+.bft-img-button>svg {
+    justify-self: center;
+}
+
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <div id="loginPage">
+        <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-md w-full space-y-8">
+                <div><h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Đăng nhập vào tài khoản</h2></div>
+                <div class="mt-8 space-y-6 bg-white p-8 shadow-2xl rounded-xl">
+                    <input id="usernameInput" type="text" placeholder="Tên đăng nhập (nhập 'admin' để vào)" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <input type="password" placeholder="Mật khẩu" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <button onclick="handleLogin()" class="w-full py-3 px-4 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-700 transition">Đăng nhập</button>
+                    <p class="text-center text-sm">Chưa có tài khoản? <a href="#" onclick="showPage('registerPage')" class="font-medium text-blue-600 hover:text-blue-500">Đăng ký</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="registerPage" class="hidden">
+        <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8"><div class="max-w-md w-full space-y-8"><div><h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Tạo tài khoản mới</h2></div><div class="mt-8 space-y-6 bg-white p-8 shadow-2xl rounded-xl"><input type="text" placeholder="Tên đăng nhập" class="w-full px-3 py-2 border border-gray-300 rounded-md"><input type="email" placeholder="Email" class="w-full px-3 py-2 border border-gray-300 rounded-md"><input type="password" placeholder="Mật khẩu" class="w-full px-3 py-2 border border-gray-300 rounded-md"><input type="password" placeholder="Nhập lại mật khẩu" class="w-full px-3 py-2 border border-gray-300 rounded-md"><button onclick="showPage('appPage')" class="w-full py-3 px-4 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-700 transition">Đăng ký</button><p class="text-center text-sm">Đã có tài khoản? <a href="#" onclick="showPage('loginPage')" class="font-medium text-blue-600 hover:text-blue-500">Đăng nhập</a></p></div></div></div>
+    </div>
+    
+    <div id="appPage" class="hidden">
+        <nav class="bg-white shadow-md sticky top-0 z-40">
+            <div class="max-w-screen-xl mx-auto px-4">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center"><span class="font-bold text-xl text-gray-800">Gia Phả Online</span></div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-600">Xin chào, Người Dùng!</span>
+                        <button onclick="showPage('loginPage')" class="px-3 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700">Đăng xuất</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <main class="max-w-screen-xl mx-auto py-6 px-4">
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
+                    <h1 class="text-2xl font-bold text-gray-900">Gia phả dòng họ Trần Lê</h1>
+                    <div class="flex gap-2">
+                        <button onclick="openAddMemberModal()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-semibold">➕ Thêm Thành Viên</button>
+                        <button onclick="showPage('createTreePage')" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold">Tạo Gia Phả Mới</button>
+                    </div>
+                </div>
+                <div id="tree" class="border-2 border-dashed border-gray-300 rounded-lg p-2"></div>
+            </div>
+        </main>
+    </div>
+
+    <div id="addMemberModal" class="custom-modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold text-gray-900">Thêm Thành Viên Mới</h2>
+                <button onclick="closeAddMemberModal()" class="text-gray-500 hover:text-gray-700 text-3xl">&times;</button>
+            </div>
+            
+            <form id="addMemberForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Họ và Tên *</label>
+                    <input type="text" id="memberName" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Giới tính *</label>
+                    <select id="memberGender" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="male">Nam</option>
+                        <option value="female">Nữ</option>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Năm sinh</label>
+                        <input type="text" id="memberDob" placeholder="VD: 1990" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Năm mất</label>
+                        <input type="text" id="memberDod" placeholder="VD: 2020" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Quan hệ</label>
+                    <select id="memberRelation" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="independent">Thành viên độc lập (gốc)</option>
+                        <option value="child">Con của</option>
+                        <option value="spouse">Vợ/Chồng của</option>
+                    </select>
+                </div>
+                
+                <div id="parentSelectDiv" class="hidden">
+                    <label id="parentSelectLabel" class="block text-sm font-medium text-gray-700 mb-1">Chọn người liên kết</label>
+                    <select id="memberParent" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <option value="">-- Chọn --</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">URL Ảnh đại diện</label>
+                    <input type="text" id="memberImg" placeholder="https://..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <p class="text-xs text-gray-500 mt-1">Để trống sẽ dùng ảnh mặc định</p>
+                </div>
+                
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="button" onclick="closeAddMemberModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition">Hủy</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition">Thêm Thành Viên</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="createTreePage" class="hidden">
+        <div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-md w-full space-y-8">
+                <div>
+                    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Tạo Gia Phả Mới</h2>
+                </div>
+                <div class="mt-8 space-y-6 bg-white p-8 shadow-2xl rounded-xl">
+                    <input type="text" placeholder="Tên Gia Phả (ví dụ: Gia phả dòng họ Trần Lê)" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                    <input type="text" placeholder="Nơi Bắt Nguồn (ví dụ: Làng Mẹo, Thái Bình)" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <input type="text" placeholder="Tên Chi (nếu có, ví dụ: Chi thứ hai)" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <textarea placeholder="Ghi chú hoặc mô tả chi tiết về dòng họ (tùy chọn)" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="showPage('appPage')" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition duration-150">Hủy</button>
+                        <button onclick="showPage('appPage')" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-150">Tạo mới</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="adminPage" class="hidden">
+        <nav class="bg-white shadow-md sticky top-0 z-40">
+             <div class="max-w-screen-xl mx-auto px-4">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center"><span class="font-bold text-xl text-gray-800">Trang Quản Trị</span></div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-600">Xin chào, Admin!</span>
+                        <button onclick="showPage('loginPage')" class="px-3 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700">Đăng xuất</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <main class="max-w-screen-xl mx-auto py-6 px-4">
+            <div class="bg-white p-6 rounded-xl shadow-lg">
+                <h1 class="text-2xl font-bold text-gray-900 mb-6">Quản lý Người dùng</h1>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead class="bg-gray-200">
+                            <tr>
+                                <th class="py-3 px-4 text-left">Tên đăng nhập</th>
+                                <th class="py-3 px-4 text-left">Email</th>
+                                <th class="py-3 px-4 text-left">Ngày tạo</th>
+                                <th class="py-3 px-4 text-center">Trạng thái</th>
+                                <th class="py-3 px-4 text-center">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://balkan.app/js/familytree.js"></script>
+
+    <script>
+    
+    const pages = ['loginPage', 'registerPage', 'appPage', 'createTreePage', 'adminPage'];
+    let familyTreeInstance = null;
+    
+    // Sử dụng let để có thể thay đổi dữ liệu
+    let familyData = [
+        {id: 1, pids: [2], name: "Trần Văn A", gender: "male", dob: "1940", dod: "2010", img: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" },
+        {id: 2, pids: [1], name: "Lê Thị B", gender: "female", dob: "1945", dod: "2015", img: "https://cdn-icons-png.flaticon.com/512/3135/3135789.png" },
+        {id: 3, mid: 2,  fid: 1,  name: "Trần Văn C", gender: "male", dob: "1965", img: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" },
+        {id: 4, mid: 2,  pids: [5], fid: 1, name: "Trần Thị D", gender: "female", dob: "1968", img: "https://cdn-icons-png.flaticon.com/512/3135/3135789.png" },
+        {id: 5, pids: [4], name: "Nguyễn Văn E", gender: "male", dob: "1966", img: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" },
+        {id: 6, mid: 4, fid: 5, name: "Nguyễn Trần F", gender: "male", dob: "1995", img: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" },
+        {id: 7, mid: 2, fid: 1, name: "Trần Văn G", gender: "male", dob: "1972", img: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" },
+        {id: 8, mid: 2, fid: 1, name: "Trần Thị H", gender: "female", dob: "1975", img: "https://cdn-icons-png.flaticon.com/512/3135/3135789.png" }
+    ];
+
+    function showPage(pageId) {
+        pages.forEach(id => { document.getElementById(id).style.display = 'none'; });
+        document.getElementById(pageId).style.display = 'block';
+
+        if (pageId === 'appPage' && !familyTreeInstance) {
+            initializeFamilyTree();
+        }
+        
+        if (pageId === 'adminPage') {
+            renderUserTable();
+        }
+    }
+
+    function initializeFamilyTree() {
+        if (familyTreeInstance) {
+            familyTreeInstance.load(familyData);
+            return;
+        };
+
+        const treeElement = document.getElementById('tree');
+        FamilyTree.SEARCH_PLACEHOLDER = "Tìm kiếm...";
+
+        familyTreeInstance = new FamilyTree(treeElement, {
+            nodes: familyData,
+            template: 'hugo',
+            roots: [1],
+            nodeMenu: {
+                details: { text: "Chi tiết" },
+                edit: { text: "Sửa" },
+                remove: { text: "Xóa" } // Giữ lại nút xóa
+            },
+            nodeBinding: {
+                field_0: "name",
+                field_1: (sender, node) => (node.data.dob || '') + (node.data.dod ? ` - ${node.data.dod}` : ''),
+                img_0: "img"
+            },
+            editForm: {
+                titleBinding: "name",
+                photoBinding: "img",
+                generateElementsFromFields: false,
+                elements: [
+                    { type: 'textbox', label: 'Họ và Tên', binding: 'name' },
+                    { type: 'textbox', label: 'Hình ảnh (URL)', binding: 'img' },
+                    { type: 'select', label: 'Giới tính', binding: 'gender', options: [
+                        { value: 'male', text: 'Nam' },
+                        { value: 'female', text: 'Nữ' }
+                    ]},
+                    { type: 'textbox', label: 'Năm sinh', binding: 'dob' },
+                    { type: 'textbox', label: 'Năm mất', binding: 'dod' }
+                ],
+                buttons: {
+    edit: { 
+        text: 'Cập nhật', 
+        icon: FamilyTree.icon.edit(24, 24, '#FFFF') // Icon cây bút
+    },
+    share: null,
+    pdf: null,
+    remove: { 
+        text: 'Xóa', 
+        icon: FamilyTree.icon.remove(24, 24, '#F57C00') // Icon thùng rác
+    }
+}
+            },
+            enableDragDrop: true,
+            searchFields: ["name"]
+        });
+
+        // === LOGIC XÓA THÀNH VIÊN ===
+        familyTreeInstance.on('remove', function(sender, args) {
+             // Thư viện sẽ xóa node trên UI, chúng ta cần xử lý xóa trong mảng `familyData`
+            const nodeIdToRemove = args.node.id;
+
+            // Tìm vị trí của node trong mảng
+            const indexToRemove = familyData.findIndex(member => member.id == nodeIdToRemove);
+            
+            if (indexToRemove !== -1) {
+                // Xóa thành viên khỏi mảng
+                familyData.splice(indexToRemove, 1);
+                
+                // Dọn dẹp các mối quan hệ liên quan đến thành viên đã bị xóa
+                familyData.forEach(member => {
+                    // Xóa khỏi danh sách vợ/chồng (pids)
+                    if (member.pids && member.pids.includes(nodeIdToRemove)) {
+                        member.pids = member.pids.filter(pid => pid !== nodeIdToRemove);
+                    }
+                    // Xóa liên kết cha (fid)
+                    if (member.fid == nodeIdToRemove) {
+                        delete member.fid;
+                    }
+                    // Xóa liên kết mẹ (mid)
+                    if (member.mid == nodeIdToRemove) {
+                        delete member.mid;
+                    }
+                });
+                
+                console.log('Đã xóa thành viên. Dữ liệu hiện tại:', familyData);
+                alert('Đã xóa thành viên thành công!');
+                // Không cần load lại cây vì thư viện đã tự cập nhật UI
+            }
+             // Trả về true để xác nhận hành động xóa
+            return true;
+        });
+    }
+
+    // === LOGIC CHO MODAL THÊM THÀNH VIÊN ===
+
+    function openAddMemberModal() {
+        document.getElementById('addMemberModal').classList.add('active');
+        document.body.classList.add('modal-active');
+        document.getElementById('addMemberForm').reset();
+        document.getElementById('parentSelectDiv').classList.add('hidden');
+        updateParentSelect();
+    }
+
+    function closeAddMemberModal() {
+        document.getElementById('addMemberModal').classList.remove('active');
+        document.body.classList.remove('modal-active');
+    }
+
+    function updateParentSelect() {
+        const parentSelect = document.getElementById('memberParent');
+        parentSelect.innerHTML = '<option value="">-- Chọn --</option>';
+        familyData.forEach(member => {
+            const option = document.createElement('option');
+            option.value = member.id;
+            option.textContent = `${member.name} (ID: ${member.id})`;
+            parentSelect.appendChild(option);
+        });
+    }
+    
+    // Xử lý khi thay đổi lựa chọn quan hệ
+    document.getElementById('memberRelation').addEventListener('change', function() {
+        const parentDiv = document.getElementById('parentSelectDiv');
+        const parentLabel = document.getElementById('parentSelectLabel');
+        if (this.value === 'child') {
+            parentLabel.textContent = 'Chọn Cha hoặc Mẹ';
+            parentDiv.classList.remove('hidden');
+        } else if (this.value === 'spouse') {
+             parentLabel.textContent = 'Chọn Vợ hoặc Chồng';
+            parentDiv.classList.remove('hidden');
+        } else {
+            parentDiv.classList.add('hidden');
+        }
+    });
+
+    // Xử lý khi submit form thêm thành viên
+    document.getElementById('addMemberForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('memberName').value.trim();
+        const gender = document.getElementById('memberGender').value;
+        const dob = document.getElementById('memberDob').value.trim();
+        const dod = document.getElementById('memberDod').value.trim();
+        const relation = document.getElementById('memberRelation').value;
+        const parentId = document.getElementById('memberParent').value;
+        const imgUrl = document.getElementById('memberImg').value.trim();
+        
+        const newId = familyData.length > 0 ? Math.max(...familyData.map(m => m.id)) + 1 : 1;
+        const defaultImg = gender === 'male' ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' : 'https://cdn-icons-png.flaticon.com/512/3135/3135789.png';
+        
+        const newMember = { id: newId, name, gender, img: imgUrl || defaultImg };
+        if (dob) newMember.dob = dob;
+        if (dod) newMember.dod = dod;
+        
+        if (relation === 'child' && parentId) {
+            const parent = familyData.find(m => m.id == parentId);
+            if (parent) {
+                if (parent.gender === 'male') {
+                    newMember.fid = parseInt(parentId);
+                    if (parent.pids && parent.pids.length > 0) newMember.mid = parent.pids[0];
+                } else {
+                    newMember.mid = parseInt(parentId);
+                    if (parent.pids && parent.pids.length > 0) newMember.fid = parent.pids[0];
+                }
+            }
+        } else if (relation === 'spouse' && parentId) {
+            newMember.pids = [parseInt(parentId)];
+            const spouse = familyData.find(m => m.id == parentId);
+            if (spouse) {
+                if (!spouse.pids) spouse.pids = [];
+                spouse.pids.push(newId);
+            }
+        }
+        
+        familyData.push(newMember);
+        console.log('Added new member:', newMember, 'Current data:', familyData);
+        
+        if (familyTreeInstance) {
+            familyTreeInstance.load(familyData);
+        }
+        
+        closeAddMemberModal();
+        alert('Đã thêm thành viên mới thành công!');
+    });
+
+
+    // === LOGIC ĐĂNG NHẬP VÀ QUẢN LÝ USER ===
+
+    function handleLogin() {
+        const username = document.getElementById('usernameInput').value.trim();
+        if (username.toLowerCase() === 'admin') {
+            showPage('adminPage');
+        } else {
+            showPage('appPage');
+        }
+    }
+
+    let mockUsers = [
+        { id: 1, username: 'nguoidung1', email: 'nguoidung1@email.com', created: '2023-10-26', active: true },
+        { id: 2, username: 'thanhvien2', email: 'tv2@email.com', created: '2023-10-25', active: true },
+        { id: 3, username: 'user_tam_khoa', email: 'user3@email.com', created: '2023-10-24', active: false },
+    ];
+
+    function toggleUserStatus(userId) {
+        const user = mockUsers.find(u => u.id === userId);
+        if (user) {
+            user.active = !user.active;
+            renderUserTable();
+        }
+    }
+
+    function renderUserTable() {
+        const tableBody = document.getElementById('user-table-body');
+        tableBody.innerHTML = '';
+        mockUsers.forEach(user => {
+            const statusClass = user.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+            const statusText = user.active ? 'Hoạt động' : 'Bị khóa';
+            const buttonClass = user.active ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-500 hover:bg-green-600';
+            const buttonText = user.active ? 'Khóa' : 'Mở khóa';
+            
+            const row = `
+                <tr class="border-b">
+                    <td class="py-3 px-4">${user.username}</td>
+                    <td class="py-3 px-4">${user.email}</td>
+                    <td class="py-3 px-4">${user.created}</td>
+                    <td class="py-3 px-4 text-center"><span class="px-2 py-1 font-semibold leading-tight text-xs rounded-full ${statusClass}">${statusText}</span></td>
+                    <td class="py-3 px-4 text-center"><button onclick="toggleUserStatus(${user.id})" class="px-3 py-1 text-white text-sm font-bold rounded-md ${buttonClass}">${buttonText}</button></td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    showPage('loginPage');
+
+</script>
+</body>
+</html>
