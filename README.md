@@ -167,6 +167,7 @@ Mở trình duyệt: `http://localhost:3001`
 - `ThanhVien` - Thành viên
 - `HonNhan` - Quan hệ vợ chồng
 - `QuanHeChaMeCon` - Quan hệ cha mẹ-con
-
+- Hãy đổi lại mật khẩu trong table user để đăng nhập
+  
 Xem chi tiết: [`database/CreateDatabase.sql`](database/CreateDatabase.sql)
 
