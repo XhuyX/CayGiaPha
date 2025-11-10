@@ -170,4 +170,3 @@ Mở trình duyệt: `http://localhost:3001`
 - Hãy đổi lại mật khẩu trong table user để đăng nhập
   
 Xem chi tiết: [`database/CreateDatabase.sql`](database/CreateDatabase.sql)
-
