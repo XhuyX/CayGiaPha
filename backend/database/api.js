@@ -383,19 +383,19 @@ router.get('/family-trees/:treeId/search', async (req, res) => {
         const { treeId } = req.params;
         const { q } = req.query;
         
-        console.log('🔍 Search request - treeId:', treeId, 'query:', q);
+        console.log(' Search request - treeId:', treeId, 'query:', q);
         
         if (!q || q.trim() === '') {
-            console.log('⚠️ Empty query, returning empty results');
+            console.log(' Empty query, returning empty results');
             return res.json({ success: true, members: [] });
         }
 
         const searchQuery = q.trim();
-        console.log('🔍 Searching with query:', searchQuery);
+        console.log('Searching with query:', searchQuery);
         
         const members = await database.searchMembers(parseInt(treeId), searchQuery);
         
-        console.log('📊 Found members:', members.length);
+        console.log('Found members:', members.length);
         
         // Transform dữ liệu từ format database sang format frontend
         const transformedMembers = members.map(m => ({
@@ -413,10 +413,10 @@ router.get('/family-trees/:treeId/search', async (req, res) => {
             AnhDaiDienURL: m.AnhDaiDienURL || ''
         }));
         
-        console.log('✅ Returning', transformedMembers.length, 'members');
+        console.log(' Returning', transformedMembers.length, 'members');
         res.json({ success: true, members: transformedMembers });
     } catch (err) {
-        console.error('❌ Backend search error:', err);
+        console.error(' Backend search error:', err);
         handleError(res, err, 'Lỗi tìm kiếm thành viên');
     }
 });

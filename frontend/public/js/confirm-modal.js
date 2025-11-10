@@ -16,6 +16,7 @@ class ConfirmModal {
                 <div class="confirm-modal-overlay"></div>
                 <div class="confirm-modal-content">
                     <div class="confirm-modal-header">
+                        <i class="fas fa-exclamation-triangle confirm-modal-icon"></i>
                         <h3 class="confirm-modal-title">Xác nhận</h3>
                     </div>
                     <div class="confirm-modal-body">
@@ -23,10 +24,10 @@ class ConfirmModal {
                     </div>
                     <div class="confirm-modal-footer">
                         <button class="confirm-modal-btn confirm-modal-btn-cancel" id="confirmModalCancel">
-                            Hủy
+                            <i class="fas fa-times mr-2"></i>Hủy
                         </button>
                         <button class="confirm-modal-btn confirm-modal-btn-confirm" id="confirmModalConfirm">
-                            Xác nhận
+                            <i class="fas fa-check mr-2"></i>Xác nhận
                         </button>
                     </div>
                 </div>
@@ -118,6 +119,12 @@ class ConfirmModal {
                 padding: 24px 24px 16px;
                 text-align: center;
                 border-bottom: 1px solid #e5e7eb;
+            }
+
+            .confirm-modal-icon {
+                font-size: 48px;
+                color: #f59e0b;
+                margin-bottom: 12px;
             }
 
             .confirm-modal-title {

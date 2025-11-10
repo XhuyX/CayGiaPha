@@ -76,13 +76,13 @@ app.use((req, res) => {
 // Start server
 app.listen(PORT, () => {
     console.log('═══════════════════════════════════════════════════════════');
-    console.log('🚀 FRONTEND SERVER ĐÃ KHỞI ĐỘNG');
+    console.log('FRONTEND SERVER ĐÃ KHỞI ĐỘNG');
     console.log('═══════════════════════════════════════════════════════════');
-    console.log(`📍 Server đang chạy tại: http://localhost:${PORT}`);
-    console.log(`🎨 View engine: EJS`);
-    console.log(`📁 Views directory: ${path.join(__dirname, 'views')}`);
-    console.log(`📂 Static files: ${path.join(__dirname, 'public')}`);
-    console.log(`🔗 Backend proxy: ${process.env.BACKEND_URL || 'http://localhost:3000'}`);
+    console.log(`Server đang chạy tại: http://localhost:${PORT}`);
+    console.log(`View engine: EJS`);
+    console.log(`Views directory: ${path.join(__dirname, 'views')}`);
+    console.log(`Static files: ${path.join(__dirname, 'public')}`);
+    console.log(`Backend proxy: ${process.env.BACKEND_URL || 'http://localhost:3000'}`);
     console.log('═══════════════════════════════════════════════════════════');
 });
 

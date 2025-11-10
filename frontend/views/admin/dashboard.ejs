@@ -155,6 +155,7 @@
                                                 class="px-4 py-2 text-sm font-semibold rounded-lg transition-all shadow-md hover:shadow-lg <%= btnClass %>"
                                                 data-user-id="<%= userId %>"
                                                 data-is-active="<%= userActive %>">
+                                                <i class="fas fa-<%= iconName %> mr-1"></i>
                                                 <%= btnText %>
                                             </button>
                                         </td>
@@ -473,13 +474,13 @@ async function renderTreeListLocal() {
 // User management - định nghĩa trong IIFE để tránh conflict với main.js
 (function() {
     window.adminToggleUserStatus = async function(userId, currentActiveStatus) {
-        console.log('🔒 Toggle user status called:', { userId, currentActiveStatus });
+        console.log('Toggle user status called:', { userId, currentActiveStatus });
         
         try {
             // Xác định trạng thái mới (toggle từ trạng thái hiện tại)
             const newActiveStatus = !currentActiveStatus;
             
-            console.log('🔄 Switching to status:', newActiveStatus);
+            console.log('Switching to status:', newActiveStatus);
             
             const response = await fetch(`/api/admin/users/${userId}/status`, {
                 method: 'PUT',
@@ -487,17 +488,17 @@ async function renderTreeListLocal() {
                 body: JSON.stringify({ active: newActiveStatus })
             });
             
-            console.log('📡 Response status:', response.status);
+            console.log('Response status:', response.status);
             
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error('❌ HTTP error:', response.status, errorText);
+                console.error('HTTP error:', response.status, errorText);
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
             const data = await response.json();
             
-            console.log('✅ Response data:', data);
+            console.log('Response data:', data);
             
             if (data.success) {
                 if (typeof showToast !== 'undefined') {
@@ -510,7 +511,7 @@ async function renderTreeListLocal() {
                     location.reload();
                 }, 1000);
             } else {
-                console.error('❌ API returned success: false', data);
+                console.error('API returned success: false', data);
                 if (typeof showToast !== 'undefined') {
                     showToast('Cập nhật thất bại: ' + (data.message || 'Có lỗi xảy ra'), 'error');
                 } else {
@@ -518,7 +519,7 @@ async function renderTreeListLocal() {
                 }
             }
         } catch (error) {
-            console.error('❌ Failed to toggle user status:', error);
+            console.error('Failed to toggle user status:', error);
             const errorMsg = error.message || 'Có lỗi xảy ra';
             if (typeof showToast !== 'undefined') {
                 showToast('Lỗi cập nhật: ' + errorMsg, 'error');

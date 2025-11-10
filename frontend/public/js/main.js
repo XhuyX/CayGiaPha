@@ -203,9 +203,9 @@ async function reloadTreeById(treeId) {
                     return updatedTree;
                 }
             } catch (e) {
-                console.error('❌ Failed to reload via detail endpoint:', e);
+                console.error(' Failed to reload via detail endpoint:', e);
             }
-            console.error('❌ Cannot reload tree: no userId available');
+            console.error(' Cannot reload tree: no userId available');
             return null;
         }
     }
@@ -233,7 +233,7 @@ async function reloadTreeById(treeId) {
         
         return null;
     } catch (error) {
-        console.error('❌ Failed to reload tree:', error);
+        console.error(' Failed to reload tree:', error);
         return null;
     }
 }
@@ -415,13 +415,13 @@ if (createTreeFormEl && !createTreeFormListenerAdded) {
 function loadFamilyTree(treeId) {
     const tree = familyTrees.find(t => t.id === treeId);
     if (!tree) {
-        console.error('❌ Tree not found:', treeId);
+        console.error(' Tree not found:', treeId);
         return;
     }
     
     const treeElement = document.getElementById('tree');
     if (!treeElement) {
-        console.error('❌ Tree element not found in DOM');
+        console.error(' Tree element not found in DOM');
         return;
     }
     
@@ -465,7 +465,7 @@ function loadFamilyTree(treeId) {
         // Load data
         familyTreeInstance.load(tree.members);
     } catch (error) {
-        console.error('❌ Error creating/loading tree:', error);
+        console.error(' Error creating/loading tree:', error);
         treeElement.innerHTML = `
             <div class="tree-empty">
                 <p class="text-red-600">Lỗi khi tải cây gia phả: ${error.message}</p>
@@ -568,7 +568,7 @@ function loadFamilyTree(treeId) {
             // Update successful - reload tree từ server với đầy đủ members
             const reloaded = await reloadTreeById(currentTreeId);
             if (!reloaded) {
-                console.error('❌ Failed to reload tree data');
+                console.error(' Failed to reload tree data');
                 showToast('Thành viên đã được cập nhật nhưng không thể reload tree. Vui lòng refresh trang.', 'warning');
                 return;
             }
@@ -581,7 +581,7 @@ function loadFamilyTree(treeId) {
             showToast('Cập nhật thành công!', 'success');
         })
         .catch(error => {
-            console.error('❌ Update failed:', error);
+            console.error(' Update failed:', error);
             showToast('Lỗi cập nhật: ' + error.message, 'error');
             location.reload();
         });
@@ -598,7 +598,7 @@ function loadFamilyTree(treeId) {
             // Reload tree từ server với đầy đủ members
             const reloaded = await reloadTreeById(currentTreeId);
             if (!reloaded) {
-                console.error('❌ Failed to reload tree data');
+                console.error(' Failed to reload tree data');
                 showToast('Thành viên đã được xóa nhưng không thể reload tree. Vui lòng refresh trang.', 'warning');
                 return;
             }
@@ -611,7 +611,7 @@ function loadFamilyTree(treeId) {
             
             showToast('Đã xóa thành viên thành công!', 'success');
         } catch (error) {
-            console.error('❌ Delete failed:', error);
+            console.error(' Delete failed:', error);
             showToast('Lỗi xóa thành viên: ' + error.message, 'error');
         }
     });
@@ -861,7 +861,7 @@ if (addMemberFormEl) {
         // Reload tree từ server với đầy đủ members
         const reloaded = await reloadTreeById(currentTreeId);
         if (!reloaded) {
-            console.error('❌ Failed to reload tree data');
+            console.error(' Failed to reload tree data');
             showToast('Thành viên đã được thêm nhưng không thể reload tree. Vui lòng refresh trang.', 'warning');
             return;
         }
@@ -983,7 +983,7 @@ function editCurrentMember() {
     const memberId = currentDetailMemberId;
     
     if (!memberId) {
-        console.error('❌ editCurrentMember: currentDetailMemberId is null');
+        console.error(' editCurrentMember: currentDetailMemberId is null');
         return;
     }
     
@@ -1025,7 +1025,7 @@ function deleteCurrentMember() {
 async function performSearch() {
     const searchQuery = document.getElementById('searchMemberInput').value.trim();
     
-    console.log('🔍 Frontend search - query:', searchQuery, 'treeId:', currentTreeId);
+    console.log('Frontend search - query:', searchQuery, 'treeId:', currentTreeId);
     
     if (!searchQuery) {
         if (typeof showToast !== 'undefined') {
@@ -1043,16 +1043,16 @@ async function performSearch() {
     
     try {
         const searchUrl = `/family-trees/${currentTreeId}/search?q=${encodeURIComponent(searchQuery)}`;
-        console.log('🔍 Calling API:', searchUrl);
+        console.log('Calling API:', searchUrl);
         
         const result = await apiCall(searchUrl);
         
-        console.log('📊 Search result:', result);
+        console.log('Search result:', result);
         
         // Kiểm tra nhiều format có thể có của kết quả
         const members = result.members || result.data || result.results || [];
         
-        console.log('📋 Members found:', members.length);
+        console.log('Members found:', members.length);
         
         
         if (!members || members.length === 0) {

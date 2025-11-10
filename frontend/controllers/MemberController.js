@@ -89,7 +89,7 @@ class MemberController {
             
             res.json(data);
         } catch (error) {
-            console.error('❌ Search error:', error);
+            console.error('Search error:', error);
             res.json({ success: false, members: [], error: error.message });
         }
     }

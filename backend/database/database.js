@@ -21,7 +21,7 @@ class Database {
             this.pool = await sql.connect(config);
             return this.pool;
         } catch (err) {
-            console.error('❌ Lỗi kết nối database:', err);
+            console.error('Lỗi kết nối database:', err);
             throw err;
         }
     }
@@ -32,7 +32,7 @@ class Database {
                 await this.pool.close();
             }
         } catch (err) {
-            console.error('❌ Lỗi đóng kết nối:', err);
+            console.error('Lỗi đóng kết nối:', err);
         }
     }
 
@@ -266,14 +266,14 @@ class Database {
     // UC-08: Tìm Kiếm Thành Viên
     async searchMembers(treeId, searchQuery) {
         try {
-            console.log('🔍 Database search - treeId:', treeId, 'query:', searchQuery);
+            console.log('Database search - treeId:', treeId, 'query:', searchQuery);
             
             // Không convert sang lowercase ngay, để SQL Server tự xử lý với COLLATE
             const searchTrimmed = searchQuery.trim();
             const searchPattern = `%${searchTrimmed}%`;
             
-            console.log('🔍 Search pattern:', searchPattern);
-            console.log('🔍 Search original:', searchTrimmed);
+            console.log('Search pattern:', searchPattern);
+            console.log('Search original:', searchTrimmed);
             
             // Thử nhiều cách để đảm bảo tìm được
             // Cách 1: Dùng LIKE với COLLATE Vietnamese_CI_AS (case-insensitive)
@@ -289,9 +289,9 @@ class Database {
                         AND HoVaTen COLLATE Vietnamese_CI_AS LIKE @searchPattern COLLATE Vietnamese_CI_AS
                         ORDER BY HoVaTen
                     `);
-                console.log('📊 COLLATE result:', result.recordset ? result.recordset.length : 0, 'members');
+                console.log('COLLATE result:', result.recordset ? result.recordset.length : 0, 'members');
             } catch (collateError) {
-                console.log('⚠️ COLLATE not supported, trying CHARINDEX...');
+                console.log('COLLATE not supported, trying CHARINDEX...');
                 // Cách 2: CHARINDEX với cả uppercase và lowercase
                 const searchLower = searchTrimmed.toLowerCase();
                 const searchUpper = searchTrimmed.toUpperCase();
@@ -311,12 +311,12 @@ class Database {
                         )
                         ORDER BY HoVaTen
                     `);
-                console.log('📊 CHARINDEX result:', result.recordset ? result.recordset.length : 0, 'members');
+                console.log('CHARINDEX result:', result.recordset ? result.recordset.length : 0, 'members');
             }
             
             // Nếu không có kết quả, thử với LIKE đơn giản (không COLLATE)
             if (!result.recordset || result.recordset.length === 0) {
-                console.log('⚠️ No results, trying simple LIKE...');
+                console.log('No results, trying simple LIKE...');
                 const likeResult = await this.pool.request()
                     .input('treeId', sql.Int, treeId)
                     .input('searchPattern', sql.NVarChar, searchPattern)
@@ -327,7 +327,7 @@ class Database {
                         AND HoVaTen LIKE @searchPattern
                         ORDER BY HoVaTen
                     `);
-                console.log('📊 Simple LIKE result:', likeResult.recordset ? likeResult.recordset.length : 0, 'members');
+                console.log('Simple LIKE result:', likeResult.recordset ? likeResult.recordset.length : 0, 'members');
                 
                 if (likeResult.recordset && likeResult.recordset.length > 0) {
                     result = likeResult;
@@ -336,7 +336,7 @@ class Database {
             
             // Nếu vẫn không có, thử với LOWER
             if (!result.recordset || result.recordset.length === 0) {
-                console.log('⚠️ No results, trying LOWER LIKE...');
+                console.log('No results, trying LOWER LIKE...');
                 const searchLower = searchTrimmed.toLowerCase();
                 const searchPatternLower = `%${searchLower}%`;
                 const lowerResult = await this.pool.request()
@@ -349,21 +349,21 @@ class Database {
                         AND LOWER(HoVaTen) LIKE @searchPatternLower
                         ORDER BY HoVaTen
                     `);
-                console.log('📊 LOWER LIKE result:', lowerResult.recordset ? lowerResult.recordset.length : 0, 'members');
+                console.log('LOWER LIKE result:', lowerResult.recordset ? lowerResult.recordset.length : 0, 'members');
                 
                 if (lowerResult.recordset && lowerResult.recordset.length > 0) {
                     result = lowerResult;
                 }
             }
             
-            console.log('✅ Final result:', result.recordset ? result.recordset.length : 0, 'members');
+            console.log('Final result:', result.recordset ? result.recordset.length : 0, 'members');
             if (result.recordset && result.recordset.length > 0) {
-                console.log('📋 Found names:', result.recordset.map(r => r.HoVaTen).join(', '));
+                console.log('Found names:', result.recordset.map(r => r.HoVaTen).join(', '));
             }
             
             return result.recordset || [];
         } catch (err) {
-            console.error('❌ Database search error:', err);
+            console.error('Database search error:', err);
             console.error('Error details:', err.message);
             throw err;
         }

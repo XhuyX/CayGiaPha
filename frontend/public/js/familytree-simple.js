@@ -530,11 +530,11 @@ class SimpleFamilyTree {
         // Final check: Đảm bảo TẤT CẢ nodes đều có position
         this.nodes.forEach(node => {
             if (node.x === undefined || node.x === null) {
-                console.error(`❌ Node ${node.name} (${node.id}) không có x position sau khi tính layout!`);
+                console.error(`Node ${node.name} (${node.id}) không có x position sau khi tính layout!`);
                 node.x = 0;
             }
             if (node.y === undefined || node.y === null) {
-                console.error(`❌ Node ${node.name} (${node.id}) không có y position sau khi tính layout!`);
+                console.error(`Node ${node.name} (${node.id}) không có y position sau khi tính layout!`);
                 node.y = 0;
             }
         });
@@ -1364,9 +1364,9 @@ class SimpleFamilyTree {
         `;
         
         const menuItems = [
-            { label: '👁️ Chi tiết', action: () => this.triggerEvent('click', node) },
-            { label: '✏️ Sửa', action: () => this.showEditForm(node) },
-            { label: '🗑️ Xóa', action: () => this.removeNode(node) }
+            { label: 'Chi tiết', action: () => this.triggerEvent('click', node) },
+            { label: 'Sửa', action: () => this.showEditForm(node) },
+            { label: 'Xóa', action: () => this.removeNode(node) }
         ];
         
         menuItems.forEach(item => {
