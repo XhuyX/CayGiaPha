@@ -1,24 +1,24 @@
-# 🌳 Hệ Thống Quản Lý Gia Phả Online
+# Hệ Thống Quản Lý Gia Phả Online
 
 Ứng dụng web quản lý cây gia phả trực tuyến với giao diện đẹp và tính năng đầy đủ.
 
-## 📋 Tổng quan
+## Tổng quan
 
 Hệ thống cho phép người dùng:
-- ✅ Tạo và quản lý nhiều cây gia phả
-- ✅ Thêm/sửa/xóa thành viên
-- ✅ Quản lý quan hệ (hôn nhân, cha mẹ-con, ruột/nuôi)
-- ✅ Xem sơ đồ cây gia phả trực quan
-- ✅ Tìm kiếm thành viên (hỗ trợ tiếng Việt)
-- ✅ Quản lý người dùng (Admin)
+- Tạo và quản lý nhiều cây gia phả
+- Thêm/sửa/xóa thành viên
+- Quản lý quan hệ (hôn nhân, cha mẹ-con, ruột/nuôi)
+- Xem sơ đồ cây gia phả trực quan
+- Tìm kiếm thành viên (hỗ trợ tiếng Việt)
+- Quản lý người dùng (Admin)
 
-## 🛠️ Công nghệ
+## Công nghệ
 
 - **Frontend:** Node.js + Express.js (EJS), Tailwind CSS, Vanilla JS
 - **Backend:** Node.js + Express.js, Microsoft SQL Server
 - **Library:** [Balkan FamilyTree.js](https://balkan.app/FamilyTreeJS)
 
-## 📁 Cấu trúc thư mục
+## Cấu trúc thư mục
 
 ```
 CayGiaPha/
@@ -46,7 +46,7 @@ CayGiaPha/
     └── CreateDatabase.sql     # SQL script tạo database
 ```
 
-## 🚀 Cài đặt và Chạy
+## Cài đặt và Chạy
 
 ### Yêu cầu
 - Node.js >= 14.x
@@ -117,7 +117,7 @@ Frontend: `http://localhost:3001`
 
 Mở trình duyệt: `http://localhost:3001`
 
-## 📚 API Endpoints
+## API Endpoints
 
 **Authentication:**
 - `POST /api/register` - Đăng ký
@@ -140,26 +140,26 @@ Mở trình duyệt: `http://localhost:3001`
 - `GET /api/admin/users` - Danh sách người dùng
 - `PUT /api/admin/users/:userId/status` - Khóa/mở khóa
 
-## 🎯 Tính năng
+## Tính năng
 
-- ✨ Modern UI với Tailwind CSS
-- 🌈 Dreamy Sky Pink Glow theme
-- 🔍 Tìm kiếm thành viên (hỗ trợ tiếng Việt)
-- 👨‍👩‍👧‍👦 Quản lý quan hệ gia đình
-- 🖱️ Tương tác bằng click phải
-- 🎭 Custom modals và dialogs
-- 🔒 Bảo mật với bcrypt
+- Modern UI với Tailwind CSS
+- Dreamy Sky Pink Glow theme
+- Tìm kiếm thành viên (hỗ trợ tiếng Việt)
+- Quản lý quan hệ gia đình
+- Tương tác bằng click phải
+- Custom modals và dialogs
+- Bảo mật với bcrypt
 
-## 📖 Hướng dẫn sử dụng
+## Hướng dẫn sử dụng
 
 1. **Thêm thành viên:** Click phải vào node → Chọn "Add father/mother/wife/son/daughter"
-2. **Sửa thông tin:** Click phải → "✏️ Sửa"
-3. **Xóa thành viên:** Click phải → "🗑️ Xóa"
-4. **Xem chi tiết:** Click phải → "📋 Chi tiết"
+2. **Sửa thông tin:** Click phải → "Sửa"
+3. **Xóa thành viên:** Click phải → "Xóa"
+4. **Xem chi tiết:** Click phải → "Chi tiết"
 5. **Tìm kiếm:** Nhập tên vào search box
 6. **Admin:** Vào `/admin` để quản lý
 
-## 🗄️ Database
+## Database
 
 **Bảng chính:**
 - `NguoiDung` - Tài khoản người dùng

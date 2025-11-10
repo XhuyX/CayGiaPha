@@ -807,7 +807,7 @@ if (addMemberFormEl) {
         }
     });
     
-    const defaultImg = gender === 'male' ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' : 'https://cdn-icons-png.flaticon.com/512/3135/3135789.png';
+    const defaultImg = '';
     
     const memberData = { 
         name, 
@@ -1084,7 +1084,7 @@ async function performSearch() {
                     <li class="border border-gray-200 rounded p-3 hover:bg-blue-50 cursor-pointer transition" 
                         onclick="highlightAndShowMember(${memberId})">
                         <div class="flex items-center gap-3">
-                            <img src="${member.img || member.AnhDaiDienURL || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'}" 
+                            <img src="${member.img || member.AnhDaiDienURL || ''}" 
                                 alt="${member.name || member.HoVaTen}" class="w-12 h-12 rounded-full object-cover">
                             <div>
                                 <div class="font-semibold text-gray-900">${member.name || member.HoVaTen}</div>

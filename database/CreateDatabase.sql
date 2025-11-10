@@ -85,21 +85,21 @@ GO
 
 -- Thêm thành viên cho cây gia phả 1
 INSERT INTO ThanhVien (MaDongHo, HoVaTen, GioiTinh, NgaySinh, NgayMat, AnhDaiDienURL) VALUES
-(1, N'Trần Văn A', N'male', '1940-01-01', '2010-12-31', N'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'),
-(1, N'Lê Thị B', N'female', '1945-02-01', '2015-06-15', N'https://cdn-icons-png.flaticon.com/512/3135/3135789.png'),
-(1, N'Trần Văn C', N'male', '1965-03-01', NULL, N'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'),
-(1, N'Trần Thị D', N'female', '1968-04-01', NULL, N'https://cdn-icons-png.flaticon.com/512/3135/3135789.png'),
-(1, N'Nguyễn Văn E', N'male', '1966-05-01', NULL, N'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'),
-(1, N'Nguyễn Trần F', N'male', '1995-06-01', NULL, N'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'),
-(1, N'Trần Văn G', N'male', '1972-07-01', NULL, N'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'),
-(1, N'Trần Thị H', N'female', '1975-08-01', NULL, N'https://cdn-icons-png.flaticon.com/512/3135/3135789.png');
+(1, N'Trần Văn A', N'male', '1940-01-01', '2010-12-31', NULL),
+(1, N'Lê Thị B', N'female', '1945-02-01', '2015-06-15', NULL),
+(1, N'Trần Văn C', N'male', '1965-03-01', NULL, NULL),
+(1, N'Trần Thị D', N'female', '1968-04-01', NULL, NULL),
+(1, N'Nguyễn Văn E', N'male', '1966-05-01', NULL, NULL),
+(1, N'Nguyễn Trần F', N'male', '1995-06-01', NULL, NULL),
+(1, N'Trần Văn G', N'male', '1972-07-01', NULL, NULL),
+(1, N'Trần Thị H', N'female', '1975-08-01', NULL, NULL);
 GO
 
 -- Thêm thành viên cho cây gia phả 2
 INSERT INTO ThanhVien (MaDongHo, HoVaTen, GioiTinh, NgaySinh, AnhDaiDienURL) VALUES
-(2, N'Nguyễn Văn X', N'male', '1950-01-01', N'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'),
-(2, N'Trần Thị Y', N'female', '1952-02-01', N'https://cdn-icons-png.flaticon.com/512/3135/3135789.png'),
-(2, N'Nguyễn Văn Z', N'male', '1975-03-01', N'https://cdn-icons-png.flaticon.com/512/3135/3135715.png');
+(2, N'Nguyễn Văn X', N'male', '1950-01-01', NULL),
+(2, N'Trần Thị Y', N'female', '1952-02-01', NULL),
+(2, N'Nguyễn Văn Z', N'male', '1975-03-01', NULL);
 GO
 
 -- Thêm quan hệ hôn nhân

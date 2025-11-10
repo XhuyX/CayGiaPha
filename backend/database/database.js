@@ -678,9 +678,7 @@ async updateMember(memberId, memberData) {
                 gender: member.GioiTinh,
                 dob: member.NgaySinh ? new Date(member.NgaySinh).getUTCFullYear().toString() : '',
                 dod: member.NgayMat ? new Date(member.NgayMat).getUTCFullYear().toString() : '',
-                img: member.AnhDaiDienURL || (member.GioiTinh === 'male' 
-                    ? 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' 
-                    : 'https://cdn-icons-png.flaticon.com/512/3135/3135789.png'),
+                img: member.AnhDaiDienURL || '',
                 tieuSu: member.TieuSu || ''
             };
 
