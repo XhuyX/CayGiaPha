@@ -195,6 +195,68 @@ class Database {
         }
     }
 
+    // Lấy cây gia phả theo share token
+    async getFamilyTreeByShareToken(shareToken) {
+        try {
+            const result = await this.pool.request()
+                .input('shareToken', sql.NVarChar, shareToken)
+                .query('SELECT * FROM DongHo WHERE ShareToken = @shareToken AND IsPublic = 1');
+            
+            return result.recordset[0] || null;
+        } catch (err) {
+            console.error('Lỗi get family tree by share token:', err);
+            throw err;
+        }
+    }
+
+    // Tạo hoặc cập nhật share token cho cây gia phả
+    async generateShareToken(treeId) {
+        try {
+            const crypto = require('crypto');
+            // Tạo token ngẫu nhiên 32 ký tự
+            const shareToken = crypto.randomBytes(16).toString('hex');
+            
+            await this.pool.request()
+                .input('treeId', sql.Int, treeId)
+                .input('shareToken', sql.NVarChar, shareToken)
+                .query('UPDATE DongHo SET ShareToken = @shareToken, IsPublic = 1 WHERE MaDongHo = @treeId');
+            
+            return shareToken;
+        } catch (err) {
+            console.error('Lỗi generate share token:', err);
+            throw err;
+        }
+    }
+
+    // Cập nhật trạng thái công khai của cây gia phả
+    async updateTreePublicStatus(treeId, isPublic) {
+        try {
+            await this.pool.request()
+                .input('treeId', sql.Int, treeId)
+                .input('isPublic', sql.Bit, isPublic)
+                .query('UPDATE DongHo SET IsPublic = @isPublic WHERE MaDongHo = @treeId');
+            
+            return true;
+        } catch (err) {
+            console.error('Lỗi update tree public status:', err);
+            throw err;
+        }
+    }
+
+    // Xóa share token (tắt tính năng share)
+    async removeShareToken(treeId) {
+        try {
+            await this.pool.request()
+                .input('treeId', sql.Int, treeId)
+                .query('UPDATE DongHo SET ShareToken = NULL, IsPublic = 0 WHERE MaDongHo = @treeId');
+            
+            return true;
+        } catch (err) {
+            console.error('Lỗi remove share token:', err);
+            throw err;
+        }
+    }
+
     // Xóa cây gia phả
     async deleteFamilyTree(treeId) {
         try {
@@ -266,14 +328,9 @@ class Database {
     // UC-08: Tìm Kiếm Thành Viên
     async searchMembers(treeId, searchQuery) {
         try {
-            console.log('Database search - treeId:', treeId, 'query:', searchQuery);
-            
             // Không convert sang lowercase ngay, để SQL Server tự xử lý với COLLATE
             const searchTrimmed = searchQuery.trim();
             const searchPattern = `%${searchTrimmed}%`;
-            
-            console.log('Search pattern:', searchPattern);
-            console.log('Search original:', searchTrimmed);
             
             // Thử nhiều cách để đảm bảo tìm được
             // Cách 1: Dùng LIKE với COLLATE Vietnamese_CI_AS (case-insensitive)
@@ -289,9 +346,7 @@ class Database {
                         AND HoVaTen COLLATE Vietnamese_CI_AS LIKE @searchPattern COLLATE Vietnamese_CI_AS
                         ORDER BY HoVaTen
                     `);
-                console.log('COLLATE result:', result.recordset ? result.recordset.length : 0, 'members');
             } catch (collateError) {
-                console.log('COLLATE not supported, trying CHARINDEX...');
                 // Cách 2: CHARINDEX với cả uppercase và lowercase
                 const searchLower = searchTrimmed.toLowerCase();
                 const searchUpper = searchTrimmed.toUpperCase();
@@ -311,12 +366,10 @@ class Database {
                         )
                         ORDER BY HoVaTen
                     `);
-                console.log('CHARINDEX result:', result.recordset ? result.recordset.length : 0, 'members');
             }
             
             // Nếu không có kết quả, thử với LIKE đơn giản (không COLLATE)
             if (!result.recordset || result.recordset.length === 0) {
-                console.log('No results, trying simple LIKE...');
                 const likeResult = await this.pool.request()
                     .input('treeId', sql.Int, treeId)
                     .input('searchPattern', sql.NVarChar, searchPattern)
@@ -327,7 +380,6 @@ class Database {
                         AND HoVaTen LIKE @searchPattern
                         ORDER BY HoVaTen
                     `);
-                console.log('Simple LIKE result:', likeResult.recordset ? likeResult.recordset.length : 0, 'members');
                 
                 if (likeResult.recordset && likeResult.recordset.length > 0) {
                     result = likeResult;
@@ -336,7 +388,6 @@ class Database {
             
             // Nếu vẫn không có, thử với LOWER
             if (!result.recordset || result.recordset.length === 0) {
-                console.log('No results, trying LOWER LIKE...');
                 const searchLower = searchTrimmed.toLowerCase();
                 const searchPatternLower = `%${searchLower}%`;
                 const lowerResult = await this.pool.request()
@@ -349,16 +400,10 @@ class Database {
                         AND LOWER(HoVaTen) LIKE @searchPatternLower
                         ORDER BY HoVaTen
                     `);
-                console.log('LOWER LIKE result:', lowerResult.recordset ? lowerResult.recordset.length : 0, 'members');
                 
                 if (lowerResult.recordset && lowerResult.recordset.length > 0) {
                     result = lowerResult;
                 }
-            }
-            
-            console.log('Final result:', result.recordset ? result.recordset.length : 0, 'members');
-            if (result.recordset && result.recordset.length > 0) {
-                console.log('Found names:', result.recordset.map(r => r.HoVaTen).join(', '));
             }
             
             return result.recordset || [];

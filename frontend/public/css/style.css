@@ -1,5 +1,5 @@
 /* Modal Styles */
-.custom-modal {
+.modal, .custom-modal {
     display: none;
     position: fixed;
     z-index: 1000;
@@ -12,7 +12,7 @@
     transition: opacity 0.3s ease;
 }
 
-.custom-modal.active {
+.modal.active, .custom-modal.active {
     display: flex;
     align-items: center;
     justify-content: center;

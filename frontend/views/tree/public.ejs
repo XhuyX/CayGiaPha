@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= typeof title !== 'undefined' ? title + ' - ' : '' %>Cây Gia Phả Công Khai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/toast.js"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+    </style>
+</head>
+<body class="font-sans">
+<div class="min-h-screen w-full bg-[#fefcff] relative">
+    <!-- Dreamy Sky Pink Glow Background -->
+    <div class="absolute inset-0 z-0" style="
+        background-image: 
+            radial-gradient(circle at 30% 70%, rgba(173, 216, 230, 0.35), transparent 60%),
+            radial-gradient(circle at 70% 30%, rgba(255, 182, 193, 0.4), transparent 60%);
+    "></div>
+    
+    <div class="relative z-10">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-40 border-b border-gray-200">
+        <div class="max-w-screen-xl mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <a href="/login" class="text-blue-600 hover:text-blue-800 font-medium transition flex items-center">
+                        <i class="fas fa-home mr-2"></i>Trang chủ
+                    </a>
+                    <div class="h-px bg-gray-300 w-8"></div>
+                    <span class="font-bold text-xl text-gray-800">
+                        <i class="fas fa-tree text-blue-600 mr-2"></i><%= typeof tree !== 'undefined' && tree ? tree.name : 'Cây Gia Phả' %>
+                    </span>
+                    <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full">
+                        <i class="fas fa-globe mr-1"></i>Công khai
+                    </span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <% if (typeof user !== 'undefined' && user) { %>
+                        <div class="flex items-center space-x-2 text-gray-600">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Xin chào, <strong><%= user.username %></strong>!</span>
+                        </div>
+                        <form action="/logout" method="POST" class="inline">
+                            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-all shadow-md hover:shadow-lg">
+                                <i class="fas fa-sign-out-alt mr-2"></i>Đăng xuất
+                            </button>
+                        </form>
+                    <% } else { %>
+                        <a href="/login" class="px-4 py-2 rounded-lg text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-md hover:shadow-lg">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Đăng nhập
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-screen-xl mx-auto py-8 px-4 fade-in">
+        <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 mb-6">
+            <% if (typeof user === 'undefined' || !user) { %>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-blue-600 mr-2 mt-1"></i>
+                    <div>
+                        <p class="font-semibold text-blue-800 mb-1">Đây là cây gia phả công khai</p>
+                        <p class="text-sm text-blue-700">Bạn đang xem cây gia phả được chia sẻ công khai. Để chỉnh sửa, vui lòng đăng nhập với tài khoản chủ sở hữu.</p>
+                    </div>
+                </div>
+            </div>
+            <% } else if (typeof isOwner !== 'undefined' && isOwner) { %>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <div class="flex items-start">
+                    <i class="fas fa-check-circle text-green-600 mr-2 mt-1"></i>
+                    <div>
+                        <p class="font-semibold text-green-800 mb-1">Bạn là chủ sở hữu của cây gia phả này</p>
+                        <p class="text-sm text-green-700">Bạn đang xem cây gia phả được chia sẻ công khai. <a href="/tree/<%= tree.id %>" class="underline font-semibold">Click vào đây</a> để vào trang chỉnh sửa.</p>
+                    </div>
+                </div>
+            </div>
+            <% } else { %>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-blue-600 mr-2 mt-1"></i>
+                    <div>
+                        <p class="font-semibold text-blue-800 mb-1">Đây là cây gia phả công khai</p>
+                        <p class="text-sm text-blue-700">Bạn đang xem cây gia phả được chia sẻ công khai. Chỉ chủ sở hữu mới có quyền chỉnh sửa.</p>
+                    </div>
+                </div>
+            </div>
+            <% } %>
+            
+            <div class="mb-4">
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">
+                    <i class="fas fa-sitemap text-blue-600 mr-2"></i><%= typeof tree !== 'undefined' && tree ? tree.name : 'Cây Gia Phả' %>
+                </h1>
+                <% if (typeof tree !== 'undefined' && tree && tree.origin) { %>
+                    <p class="text-gray-600 flex items-center">
+                        <i class="fas fa-map-marker-alt text-blue-500 mr-2"></i>
+                        <span><%= tree.origin %></span>
+                    </p>
+                <% } %>
+                <% if (typeof tree !== 'undefined' && tree && tree.branch) { %>
+                    <p class="text-gray-600 flex items-center mt-1">
+                        <i class="fas fa-code-branch text-indigo-500 mr-2"></i>
+                        <span><%= tree.branch %></span>
+                    </p>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Tree Container -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+            <div id="tree" style="min-height: 600px; width: 100%; background-color: #f9fafb; position: relative; overflow: auto;"></div>
+        </div>
+    </main>
+    </div>
+</div>
+
+<!-- Member Detail Modal (chỉ xem, không có nút sửa/xóa) -->
+<div id="memberDetailModal" class="modal">
+    <div class="modal-content">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold">Chi tiết thành viên</h2>
+            <button onclick="closeMemberDetailModal()" class="text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div id="memberDetailContent"></div>
+    </div>
+</div>
+
+<script src="/js/confirm-modal.js"></script>
+<script src="/js/familytree-simple.js"></script>
+<script src="/js/config.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/member.js"></script>
+<script src="/js/main.js"></script>
+
+<script>
+// Global variables cho public view
+if (typeof API_BASE === 'undefined') {
+    var API_BASE = '/api';
+}
+if (typeof currentTreeId === 'undefined') {
+    var currentTreeId = null;
+}
+if (typeof familyTrees === 'undefined') {
+    var familyTrees = [];
+}
+if (typeof currentUser === 'undefined') {
+    var currentUser = null; // Không có user trong public view
+}
+
+// Khởi tạo từ server data
+<% if (typeof tree !== 'undefined' && tree && tree.id) { %>
+currentTreeId = <%= tree.id %>;
+familyTrees = [<%- JSON.stringify(tree) %>];
+<% } else { %>
+console.error('Tree data không hợp lệ:', <%- JSON.stringify(tree) %>);
+<% } %>
+
+// Khởi tạo currentUser nếu đã đăng nhập
+<% if (typeof user !== 'undefined' && user) { %>
+currentUser = <%- JSON.stringify(user) %>;
+<% } else { %>
+currentUser = null;
+<% } %>
+
+// Hàm hiển thị chi tiết thành viên (chỉ xem, không có nút sửa/xóa)
+async function showMemberDetailByIdPublic(nodeId) {
+    try {
+        const detailContent = document.getElementById('memberDetailContent');
+        if (!detailContent) return;
+        
+        // Nếu đã đăng nhập, gọi API để lấy đầy đủ thông tin
+        if (currentUser && typeof apiCall === 'function') {
+            try {
+                const result = await apiCall(`/members/${nodeId}`);
+                const member = result.member;
+                
+                let html = `
+                    <div class="flex items-start space-x-4">
+                        <img src="${member.img || ''}" alt="${member.name}" class="w-24 h-24 rounded-full object-cover border-2 border-gray-300">
+                        <div>
+                            <h3 class="text-xl font-bold">${member.name}</h3>
+                            <p class="text-gray-600">${member.gender === 'male' ? 'Nam' : 'Nữ'}</p>
+                            <p class="text-sm text-gray-500">
+                                ${member.dob ? `Sinh: ${member.dob}` : ''} 
+                                ${member.dod ? ` - Mất: ${member.dod}` : member.dob ? ' (Còn sống)' : ''}
+                            </p>
+                        </div>
+                    </div>
+                `;
+                
+                if (!member.dod && member.family && member.family.partners && member.family.partners.length > 0) {
+                    html += `
+                        <div class="bg-pink-50 p-3 rounded mt-3">
+                            <strong>Vợ/Chồng:</strong>
+                            <ul class="list-disc list-inside mt-1">
+                                ${member.family.partners.map(p => `<li>${p.PartnerName || p.name || ''}</li>`).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                if (member.tieuSu) {
+                    html += `
+                        <div class="bg-blue-50 p-3 rounded mt-3">
+                            <strong>Tiểu sử:</strong>
+                            <p class="mt-1 text-gray-700 whitespace-pre-wrap">${member.tieuSu}</p>
+                        </div>
+                    `;
+                }
+                
+                if (member.family && member.family.parents && member.family.parents.length > 0) {
+                    const fathers = member.family.parents.filter(p => p.LoaiQuanHe && p.LoaiQuanHe.includes('Cha'));
+                    const mothers = member.family.parents.filter(p => p.LoaiQuanHe && p.LoaiQuanHe.includes('Mẹ'));
+                    
+                    html += `<div class="bg-green-50 p-3 rounded mt-3"><strong>Gia đình:</strong><ul class="list-disc list-inside mt-1">`;
+                    
+                    if (fathers.length > 0) {
+                        fathers.forEach(f => {
+                            const type = f.LoaiQuanHe === 'Cha ruột' ? ' (ruột)' : ' (nuôi)';
+                            html += `<li>Cha: ${f.ParentName || f.name || ''}${type}</li>`;
+                        });
+                    }
+                    
+                    if (mothers.length > 0) {
+                        mothers.forEach(m => {
+                            const type = m.LoaiQuanHe === 'Mẹ ruột' ? ' (ruột)' : ' (nuôi)';
+                            html += `<li>Mẹ: ${m.ParentName || m.name || ''}${type}</li>`;
+                        });
+                    }
+                    
+                    html += `</ul></div>`;
+                }
+                
+                if (member.family && member.family.children && member.family.children.length > 0) {
+                    html += `
+                        <div class="bg-yellow-50 p-3 rounded mt-3">
+                            <strong>Con cái (${member.family.children.length}):</strong>
+                            <ul class="list-disc list-inside mt-1">
+                                ${member.family.children.map(c => {
+                                    const type = c.LoaiQuanHe && c.LoaiQuanHe.includes('ruột') ? ' (ruột)' : ' (nuôi)';
+                                    return `<li>${c.ChildName || c.name || ''}${type}</li>`;
+                                }).join('')}
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                detailContent.innerHTML = html;
+                document.getElementById('memberDetailModal').classList.add('active');
+                document.body.classList.add('modal-active');
+                return;
+            } catch (apiError) {
+                console.error('API call failed, falling back to tree data:', apiError);
+                // Fallback to tree data nếu API fail
+            }
+        }
+        
+        // Fallback: Lấy thông tin từ tree data (đã load từ server)
+        const tree = familyTrees.find(t => t.id === currentTreeId);
+        if (!tree || !tree.members) return;
+        
+        const member = tree.members.find(m => m.id === nodeId);
+        if (!member) return;
+        
+        let html = `
+            <div class="flex items-start space-x-4 mb-4">
+                <img src="${member.img || ''}" alt="${member.name}" class="w-24 h-24 rounded-full object-cover border-2 border-gray-300">
+                <div>
+                    <h3 class="text-xl font-bold">${member.name}</h3>
+                    <p class="text-gray-600">${member.gender === 'male' ? 'Nam' : 'Nữ'}</p>
+                    <p class="text-sm text-gray-500">
+                        ${member.dob ? `Sinh: ${member.dob}` : ''} 
+                        ${member.dod ? ` - Mất: ${member.dod}` : member.dob ? ' (Còn sống)' : ''}
+                    </p>
+                </div>
+            </div>
+        `;
+        
+        if (member.tieuSu) {
+            html += `
+                <div class="bg-blue-50 p-3 rounded mb-3">
+                    <strong>Tiểu sử:</strong>
+                    <p class="mt-1 text-gray-700 whitespace-pre-wrap">${member.tieuSu}</p>
+                </div>
+            `;
+        }
+        
+        detailContent.innerHTML = html;
+        document.getElementById('memberDetailModal').classList.add('active');
+        document.body.classList.add('modal-active');
+    } catch (error) {
+        console.error('Failed to load member details:', error);
+    }
+}
+
+function closeMemberDetailModal() {
+    document.getElementById('memberDetailModal').classList.remove('active');
+    document.body.classList.remove('modal-active');
+}
+
+// Load tree data và render
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Public view - currentTreeId:', currentTreeId);
+    console.log('Public view - familyTrees:', familyTrees);
+    
+    if (!currentTreeId) {
+        console.error('currentTreeId is null! Tree data:', familyTrees);
+        document.getElementById('tree').innerHTML = `
+            <div class="text-center py-8 text-red-600">
+                <i class="fas fa-exclamation-triangle text-3xl mb-2"></i>
+                <p>Không thể tải cây gia phả. Vui lòng kiểm tra lại link chia sẻ.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    setTimeout(function() {
+        if (typeof loadFamilyTree === 'function') {
+            loadFamilyTree(currentTreeId);
+            
+            // Override click handler sau khi tree được load
+            setTimeout(() => {
+                if (familyTreeInstance) {
+                    // Remove old click handler
+                    familyTreeInstance.off('click');
+                    // Add new click handler cho public view
+                    familyTreeInstance.on('click', function(sender, node) {
+                        showMemberDetailByIdPublic(node.id);
+                    });
+                }
+            }, 500);
+        } else {
+            console.error('loadFamilyTree function not found!');
+        }
+    }, 100);
+});
+</script>
+</body>
+</html>
+

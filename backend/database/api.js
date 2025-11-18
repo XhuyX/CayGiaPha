@@ -383,19 +383,12 @@ router.get('/family-trees/:treeId/search', async (req, res) => {
         const { treeId } = req.params;
         const { q } = req.query;
         
-        console.log(' Search request - treeId:', treeId, 'query:', q);
-        
         if (!q || q.trim() === '') {
-            console.log(' Empty query, returning empty results');
             return res.json({ success: true, members: [] });
         }
 
         const searchQuery = q.trim();
-        console.log('Searching with query:', searchQuery);
-        
         const members = await database.searchMembers(parseInt(treeId), searchQuery);
-        
-        console.log('Found members:', members.length);
         
         // Transform dữ liệu từ format database sang format frontend
         const transformedMembers = members.map(m => ({
@@ -413,10 +406,9 @@ router.get('/family-trees/:treeId/search', async (req, res) => {
             AnhDaiDienURL: m.AnhDaiDienURL || ''
         }));
         
-        console.log(' Returning', transformedMembers.length, 'members');
         res.json({ success: true, members: transformedMembers });
     } catch (err) {
-        console.error(' Backend search error:', err);
+        console.error('Backend search error:', err);
         handleError(res, err, 'Lỗi tìm kiếm thành viên');
     }
 });
@@ -701,6 +693,316 @@ router.put('/admin/users/:userId/status', async (req, res) => {
         });
     } catch (err) {
         handleError(res, err, 'Lỗi cập nhật trạng thái người dùng');
+    }
+});
+
+// ==================== USER PROFILE ====================
+
+// Lấy thông tin user profile
+router.get('/user/profile', async (req, res) => {
+    try {
+        const userId = parseInt(req.headers['x-user-id']) || parseInt(req.query.userId);
+        
+        if (!userId) {
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Không xác định được người dùng' 
+            });
+        }
+        
+        const user = await database.pool.request()
+            .input('userId', sql.Int, userId)
+            .query('SELECT MaNguoiDung, TenDangNhap, Email, NgayTao FROM NguoiDung WHERE MaNguoiDung = @userId');
+        
+        if (!user.recordset || user.recordset.length === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Không tìm thấy người dùng' 
+            });
+        }
+        
+        const userData = user.recordset[0];
+        
+        res.json({
+            success: true,
+            user: {
+                id: userData.MaNguoiDung,
+                username: userData.TenDangNhap,
+                email: userData.Email,
+                createdAt: userData.NgayTao
+            }
+        });
+    } catch (err) {
+        handleError(res, err, 'Lỗi lấy thông tin người dùng');
+    }
+});
+
+// Cập nhật thông tin user profile
+router.put('/user/profile', async (req, res) => {
+    try {
+        const userId = parseInt(req.headers['x-user-id']) || parseInt(req.body.userId);
+        const { email } = req.body;
+        
+        if (!userId) {
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Không xác định được người dùng' 
+            });
+        }
+        
+        if (!email) {
+            return res.json({ 
+                success: false, 
+                message: 'Email là bắt buộc' 
+            });
+        }
+        
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.json({ 
+                success: false, 
+                message: 'Email không hợp lệ' 
+            });
+        }
+        
+        // Kiểm tra email đã tồn tại chưa (trừ user hiện tại)
+        const existingEmail = await database.getUserByEmail(email);
+        if (existingEmail && existingEmail.MaNguoiDung !== userId) {
+            return res.json({ 
+                success: false, 
+                message: 'Email đã được sử dụng' 
+            });
+        }
+        
+        await database.pool.request()
+            .input('userId', sql.Int, userId)
+            .input('email', sql.NVarChar, email)
+            .query('UPDATE NguoiDung SET Email = @email WHERE MaNguoiDung = @userId');
+        
+        res.json({ 
+            success: true, 
+            message: 'Cập nhật thông tin thành công' 
+        });
+    } catch (err) {
+        handleError(res, err, 'Lỗi cập nhật thông tin người dùng');
+    }
+});
+
+// Đổi mật khẩu
+router.post('/user/change-password', async (req, res) => {
+    try {
+        const userId = parseInt(req.headers['x-user-id']) || parseInt(req.body.userId);
+        const { currentPassword, newPassword, confirmPassword } = req.body;
+        
+        if (!userId) {
+            return res.status(401).json({ 
+                success: false, 
+                message: 'Không xác định được người dùng' 
+            });
+        }
+        
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            return res.json({ 
+                success: false, 
+                message: 'Vui lòng điền đầy đủ thông tin' 
+            });
+        }
+        
+        if (newPassword.length < 6) {
+            return res.json({ 
+                success: false, 
+                message: 'Mật khẩu mới phải có ít nhất 6 ký tự' 
+            });
+        }
+        
+        if (newPassword !== confirmPassword) {
+            return res.json({ 
+                success: false, 
+                message: 'Mật khẩu xác nhận không khớp' 
+            });
+        }
+        
+        // Lấy user hiện tại
+        const userResult = await database.pool.request()
+            .input('userId', sql.Int, userId)
+            .query('SELECT * FROM NguoiDung WHERE MaNguoiDung = @userId');
+        
+        if (!userResult.recordset || userResult.recordset.length === 0) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Không tìm thấy người dùng' 
+            });
+        }
+        
+        const user = userResult.recordset[0];
+        
+        // Kiểm tra mật khẩu hiện tại
+        let passwordValid = false;
+        if (user.MatKhau.startsWith('$2a$') || user.MatKhau.startsWith('$2b$')) {
+            passwordValid = await bcrypt.compare(currentPassword, user.MatKhau);
+        } else {
+            passwordValid = (currentPassword === user.MatKhau);
+        }
+        
+        if (!passwordValid) {
+            return res.json({ 
+                success: false, 
+                message: 'Mật khẩu hiện tại không đúng' 
+            });
+        }
+        
+        // Hash mật khẩu mới
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+        
+        // Cập nhật mật khẩu
+        await database.pool.request()
+            .input('userId', sql.Int, userId)
+            .input('password', sql.NVarChar, hashedPassword)
+            .query('UPDATE NguoiDung SET MatKhau = @password WHERE MaNguoiDung = @userId');
+        
+        res.json({ 
+            success: true, 
+            message: 'Đổi mật khẩu thành công' 
+        });
+    } catch (err) {
+        handleError(res, err, 'Lỗi đổi mật khẩu');
+    }
+});
+
+// ==================== SHARE TREE ====================
+
+// Lấy cây gia phả theo share token (công khai, không cần đăng nhập)
+router.get('/share/:token', async (req, res) => {
+    try {
+        const { token } = req.params;
+        
+        const tree = await database.getFamilyTreeByShareToken(token);
+        
+        if (!tree) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Link chia sẻ không hợp lệ hoặc đã hết hạn' 
+            });
+        }
+
+        const members = await database.getMembersByTree(tree.MaDongHo);
+        const marriages = await database.getMarriagesByTree(tree.MaDongHo);
+        const parentChildRelations = await database.getParentChildRelationsByTree(tree.MaDongHo);
+        
+        const treeWithDetails = database.transformToFrontendFormat(tree, members, marriages, parentChildRelations);
+        
+        // Thêm thông tin owner để frontend có thể kiểm tra
+        res.json({ 
+            success: true, 
+            tree: treeWithDetails, 
+            isPublic: true,
+            ownerId: tree.MaNguoiQuanLy // Thêm owner ID để frontend kiểm tra
+        });
+    } catch (err) {
+        handleError(res, err, 'Lỗi lấy thông tin cây gia phả công khai');
+    }
+});
+
+// Tạo share link cho cây gia phả
+router.post('/family-trees/:treeId/share', async (req, res) => {
+    try {
+        const { treeId } = req.params;
+        const userId = parseInt(req.body.userId) || parseInt(req.query.userId);
+        
+        // Kiểm tra quyền sở hữu
+        const tree = await database.getFamilyTreeById(parseInt(treeId));
+        if (!tree) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy cây gia phả' });
+        }
+        
+        if (tree.MaNguoiQuanLy !== userId) {
+            return res.status(403).json({ success: false, message: 'Bạn không có quyền chia sẻ cây gia phả này' });
+        }
+        
+        // Tạo hoặc lấy share token
+        let shareToken = tree.ShareToken;
+        if (!shareToken) {
+            shareToken = await database.generateShareToken(parseInt(treeId));
+        } else {
+            // Nếu đã có token, chỉ cần đánh dấu là công khai
+            await database.updateTreePublicStatus(parseInt(treeId), true);
+        }
+        
+        // Lấy frontend URL (port 3001) thay vì backend URL (port 3000)
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+        const shareUrl = `${frontendUrl}/share/${shareToken}`;
+        
+        res.json({ 
+            success: true, 
+            shareToken,
+            shareUrl
+        });
+    } catch (err) {
+        handleError(res, err, 'Lỗi tạo share link');
+    }
+});
+
+// Tắt tính năng share
+router.delete('/family-trees/:treeId/share', async (req, res) => {
+    try {
+        const { treeId } = req.params;
+        const userId = parseInt(req.body.userId) || parseInt(req.query.userId);
+        
+        // Kiểm tra quyền sở hữu
+        const tree = await database.getFamilyTreeById(parseInt(treeId));
+        if (!tree) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy cây gia phả' });
+        }
+        
+        if (tree.MaNguoiQuanLy !== userId) {
+            return res.status(403).json({ success: false, message: 'Bạn không có quyền thay đổi cài đặt chia sẻ' });
+        }
+        
+        await database.removeShareToken(parseInt(treeId));
+        
+        res.json({ success: true, message: 'Đã tắt tính năng chia sẻ' });
+    } catch (err) {
+        handleError(res, err, 'Lỗi tắt share');
+    }
+});
+
+// Lấy thông tin share link hiện tại
+router.get('/family-trees/:treeId/share', async (req, res) => {
+    try {
+        const { treeId } = req.params;
+        const userId = parseInt(req.query.userId);
+        
+        const tree = await database.getFamilyTreeById(parseInt(treeId));
+        if (!tree) {
+            return res.status(404).json({ success: false, message: 'Không tìm thấy cây gia phả' });
+        }
+        
+        if (tree.MaNguoiQuanLy !== userId) {
+            return res.status(403).json({ success: false, message: 'Bạn không có quyền xem thông tin chia sẻ' });
+        }
+        
+        // Lấy frontend URL (port 3001) thay vì backend URL (port 3000)
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+        
+        if (tree.ShareToken && tree.IsPublic) {
+            res.json({ 
+                success: true, 
+                shareToken: tree.ShareToken,
+                shareUrl: `${frontendUrl}/share/${tree.ShareToken}`,
+                isPublic: true
+            });
+        } else {
+            res.json({ 
+                success: true, 
+                shareToken: null,
+                shareUrl: null,
+                isPublic: false
+            });
+        }
+    } catch (err) {
+        handleError(res, err, 'Lỗi lấy thông tin share');
     }
 });
 

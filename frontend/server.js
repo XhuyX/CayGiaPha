@@ -53,8 +53,21 @@ app.use('/api', async (req, res) => {
         }
         
         const response = await fetch(url, options);
-        const data = await response.json();
-        res.status(response.status).json(data);
+        
+        // Kiểm tra content-type trước khi parse JSON
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+            const data = await response.json();
+            res.status(response.status).json(data);
+        } else {
+            // Nếu không phải JSON, đọc text và trả về lỗi
+            const text = await response.text();
+            console.error('API Proxy Error: Non-JSON response:', text.substring(0, 200));
+            res.status(response.status).json({ 
+                success: false, 
+                message: 'Lỗi từ server: ' + (text.substring(0, 100) || 'Unknown error')
+            });
+        }
     } catch (error) {
         console.error('API Proxy Error:', error);
         res.status(500).json({ success: false, message: error.message });

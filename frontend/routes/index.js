@@ -4,6 +4,8 @@ const AuthController = require('../controllers/AuthController');
 const TreeController = require('../controllers/TreeController');
 const MemberController = require('../controllers/MemberController');
 const AdminController = require('../controllers/AdminController');
+const UserController = require('../controllers/UserController');
+const ShareController = require('../controllers/ShareController');
 
 // Middleware để check authentication
 const requireAuth = (req, res, next) => {
@@ -57,6 +59,12 @@ router.get('/tree/:treeId/search', requireAuth, MemberController.search);
 
 // Admin routes
 router.get('/admin', requireAdmin, AdminController.dashboard);
+
+// User profile routes
+router.get('/user/profile', requireAuth, UserController.showProfile);
+
+// Public share routes (không cần đăng nhập)
+router.get('/share/:token', ShareController.viewPublicTree);
 
 module.exports = router;
 
