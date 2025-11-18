@@ -14,6 +14,35 @@ Hệ thống cho phép người dùng:
 - **Chia sẻ cây gia phả công khai** - Tạo link chia sẻ để người khác xem mà không cần đăng nhập
 - **Quản lý hồ sơ người dùng** - Xem và cập nhật thông tin tài khoản, đổi mật khẩu
 
+## Screenshots
+
+### Đăng nhập & Đăng ký
+![Đăng nhập](images/login.png)
+![Đăng ký](images/register.png)
+
+### Quản lý Cây Gia Phả
+![Danh sách cây gia phả](images/family%20tree%20list.png)
+![Tạo cây gia phả mới](images/create%20tree.png)
+![Cây gia phả](images/family%20tree.png)
+
+### Quản lý Thành viên
+![Tìm kiếm thành viên](images/find%20member.png)
+![Tạo thành viên 1](images/create%20member1.png)
+![Tạo thành viên 2](images/create%20member2.png)
+![Chi tiết thành viên](images/detail%20member.png)
+![Sửa thành viên](images/edit%20member.png)
+
+### Chia sẻ Cây Gia Phả
+![Chia sẻ cây gia phả](images/share%20tree.png)
+![Xem cây gia phả công khai](images/share%20tree%20view.png)
+
+### Quản lý Hồ sơ
+![Hồ sơ người dùng](images/profile.png)
+![Đổi mật khẩu](images/change%20password.png)
+
+### Admin Dashboard
+![Admin Dashboard](images/admin%20dashboard.png)
+
 ## Công nghệ
 
 - **Frontend:** Node.js + Express.js (EJS), Tailwind CSS, Vanilla JS
